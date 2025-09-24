@@ -1,26 +1,44 @@
-// ignore_for_file: unused_import, prefer_typing_uninitialized_variables, unnecessary_import
+// ignore_for_file: unused_import, prefer_typing_uninitialized_variables, unnecessary_import, deprecated_member_use
 
 import 'dart:ffi';
 import 'dart:ui';
 
+import 'package:dynamic_color/dynamic_color.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:system_theme/system_theme.dart';
 import 'package:timetable/chill_widget.dart' hide Colors;
 import 'package:timetable/lesson_widget.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  await SystemTheme.accentColor.load();
-  SystemTheme.accentColor.accent;
-  final accentColor = SystemTheme.accentColor.accent;
   // debugPaintSizeEnabled = true;
-  runApp(Main(accentColor: accentColor,));
+  runApp(
+    DynamicColorBuilder(
+      builder: (ColorScheme? light, ColorScheme? dark) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          themeMode: ThemeMode.system,
+          darkTheme: ThemeData(
+            colorScheme: dark,
+            useMaterial3: true,
+            useSystemColors: true,
+          ),
+          theme: ThemeData(
+            colorScheme: light,
+            useSystemColors: true,
+            useMaterial3: true,
+          ),
+          home: Main(),
+        );
+      },
+    ),
+  );
 }
 
 class Main extends StatefulWidget {
-  final Color accentColor;
-  const Main({super.key, required this.accentColor});
+  const Main({super.key});
 
   @override
   State<Main> createState() => _MainState();
@@ -29,54 +47,38 @@ class Main extends StatefulWidget {
 class _MainState extends State<Main> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.system,
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: SystemTheme.accentColor.accent,
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-        useSystemColors: true,
-      ),
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: SystemTheme.accentColor.accent,
-        ),
-        useSystemColors: true,
-        useMaterial3: true,
-      ),
-      home: Builder(
-        builder: (innerContext) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text("Test"),
-              actions: [
-                MaterialButton(
-                  onPressed: () {
-                    showBottomSheet(innerContext);
-                  },
-                  child: Text("Change group"),
-                ),
-              ],
-            ),
-            body: Column(
-              spacing: 10,
-              children: [
-                LessonWidget(mainText: "data"),
-                ChillWidget(height: 80),
-                LessonWidget(mainText: "data 2"),
-              ],
-            ),
-          );
-        },
-      ),
+    return Builder(
+      builder: (innerContext) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text("Test"),
+            actions: [
+              MaterialButton(
+                onPressed: () {
+                  showBottomSheet(innerContext);
+                },
+                child: Text("Change group"),
+              ),
+            ],
+          ),
+          body: Column(
+            spacing: 10,
+            children: [
+              LessonWidget(
+                mainText: "Основы алгоритмизации и программирование",
+              ),
+              ChillWidget(height: 80),
+              LessonWidget(mainText: "data 2"),
+            ],
+          ),
+        );
+      },
     );
   }
 
   void showBottomSheet(BuildContext context) {
     showModalBottomSheet(
+      showDragHandle: true,
       context: context,
       useRootNavigator: true,
       builder: (BuildContext context) {
@@ -88,8 +90,9 @@ class _MainState extends State<Main> {
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                   child: Card.filled(
+                    color: ColorScheme.of(context).surfaceVariant,
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: SizedBox(

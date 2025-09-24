@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class ChillWidget extends StatelessWidget {
   final double maxWidth = 650;
@@ -8,6 +7,7 @@ class ChillWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Color onBackground = ColorScheme.of(context).onSurface;
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16),
       child: Align(
@@ -26,15 +26,18 @@ class ChillWidget extends StatelessWidget {
                   children: [
                     Align(
                       alignment: AlignmentGeometry.topLeft,
-                      child: Icon(Icons.arrow_upward),
+                      child: Icon(Icons.arrow_upward, color: onBackground),
                     ),
                     Align(
                       alignment: AlignmentGeometry.centerLeft,
-                      child: Text("Text Time"),
+                      child: Text(
+                        "Text Time",
+                        style: TextStyle(color: onBackground),
+                      ),
                     ),
                     Align(
                       alignment: AlignmentGeometry.bottomLeft,
-                      child: Icon(Icons.arrow_downward),
+                      child: Icon(Icons.arrow_downward, color: onBackground),
                     ),
                   ],
                 ),
