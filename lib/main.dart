@@ -61,15 +61,57 @@ class _MainState extends State<Main> {
               ),
             ],
           ),
-          body: Column(
-            spacing: 10,
-            children: [
-              LessonWidget(
-                mainText: "Основы алгоритмизации и программирование",
-              ),
-              ChillWidget(height: 80),
-              LessonWidget(mainText: "data 2"),
-            ],
+          body: SingleChildScrollView(
+            child: Column(
+              spacing: 10,
+              children: [
+                LessonWidget(
+                  mainText: "Основы ПИ",
+                  testColor: Colors.yellow,
+                  testAud: "3-419",
+                  testPrepod: "Ровенская А И",
+                  testProgress: 0.5,
+                  testTime: "Еще 40 минут",
+                  testType: "Лабораторная",
+                ),
+                LessonWidget(
+                  mainText: "Деловые коммуникации",
+                  testColor: Colors.green,
+                  testAud: "6-718",
+                  testPrepod: "Петухова Т В",
+                  testProgress: -1,
+                  testTime: "10:00-11:20",
+                  testType: "Практика",
+                ),
+                LessonWidget(
+                  mainText: "Высшая математика",
+                  testColor: Colors.green,
+                  testAud: "6-601",
+                  testPrepod: "Анкилов А В",
+                  testProgress: -1,
+                  testTime: "11:30-12:50",
+                  testType: "Практика",
+                ),
+                LessonWidget(
+                  mainText: "Иностранный язык",
+                  testColor: Colors.green,
+                  testAud: "6-817",
+                  testPrepod: "Сытник Ю А",
+                  testProgress: -1,
+                  testTime: "13:30-14:50",
+                  testType: "Практика",
+                ),
+                LessonWidget(
+                  mainText: "Основы информационных технологий",
+                  testColor: Colors.orange,
+                  testAud: "6-817",
+                  testPrepod: "Эгов Е Н",
+                  testProgress: -1,
+                  testTime: "15:00-16:20",
+                  testType: "Лекция",
+                ),
+              ],
+            ),
           ),
         );
       },

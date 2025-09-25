@@ -5,7 +5,22 @@ import 'package:timetable/lesson_type_widget.dart';
 class LessonWidget extends StatelessWidget {
   final double maxWidth = 650;
   final String mainText;
-  const LessonWidget({super.key, required this.mainText});
+  final Color testColor;
+  final String testTime;
+  final String testAud;
+  final double testProgress;
+  final String testPrepod;
+  final String testType;
+  const LessonWidget({
+    super.key,
+    required this.mainText,
+    required this.testColor,
+    required this.testTime,
+    required this.testAud,
+    required this.testProgress,
+    required this.testPrepod,
+    required this.testType,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +68,8 @@ class LessonWidget extends StatelessWidget {
                                           ),
                                           child: LessonTypeWidget(
                                             type: LessonTypes.lecture,
+                                            testColor: testColor,
+                                            testType: testType,
                                           ),
                                         ),
                                       ),
@@ -78,7 +95,7 @@ class LessonWidget extends StatelessWidget {
                                       child: Align(
                                         alignment: AlignmentGeometry.centerLeft,
                                         child: Text(
-                                          "data",
+                                          testPrepod,
                                           style: TextStyle(color: textColor),
                                         ),
                                       ),
@@ -103,7 +120,7 @@ class LessonWidget extends StatelessWidget {
                                       child: Align(
                                         alignment: AlignmentGeometry.centerLeft,
                                         child: Text(
-                                          "data",
+                                          testAud,
                                           style: TextStyle(color: textColor),
                                         ),
                                       ),
@@ -125,7 +142,7 @@ class LessonWidget extends StatelessWidget {
                                   child: Align(
                                     alignment: AlignmentGeometry.centerRight,
                                     child: Text(
-                                      "datadatadata",
+                                      testTime,
                                       style: TextStyle(color: textColor),
                                     ),
                                   ),
@@ -134,7 +151,10 @@ class LessonWidget extends StatelessWidget {
                             ),
                             Padding(
                               padding: EdgeInsets.symmetric(vertical: 16),
-                              child: LinearProgressIndicator(year2023: false),
+                              child: LinearProgressIndicator(
+                                year2023: false,
+                                value: testProgress != -1 ? testProgress : 0,
+                              ),
                             ),
                           ],
                         ),

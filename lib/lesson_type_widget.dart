@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 
 class LessonTypeWidget extends StatelessWidget {
   final LessonTypes type;
-  const LessonTypeWidget({super.key, required this.type});
+  final Color testColor;
+  final String testType;
+  const LessonTypeWidget({
+    super.key,
+    required this.type,
+    required this.testColor, required this.testType,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,8 +20,9 @@ class LessonTypeWidget extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 8),
         child: Text(
-          "datadatadata",
-          style: TextStyle(color: ColorScheme.of(context).onSecondaryContainer),
+          testType,
+          //style: TextStyle(color: ColorScheme.of(context).onSecondaryContainer),
+          style: TextStyle(color: testColor),
         ),
       ),
     );
