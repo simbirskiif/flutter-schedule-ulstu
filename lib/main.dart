@@ -45,8 +45,12 @@ class Main extends StatefulWidget {
 }
 
 class _MainState extends State<Main> {
+  int _selectedScreen = 0;
+  bool _smallScreen = true;
+  final List<Widget> _screens = [ScheduleScreen(), NotesScreen()];
   @override
   Widget build(BuildContext context) {
+    _smallScreen = MediaQuery.of(context).size.width < 650 ? true : false;
     return Builder(
       builder: (innerContext) {
         return Scaffold(
@@ -61,57 +65,53 @@ class _MainState extends State<Main> {
               ),
             ],
           ),
-          body: SingleChildScrollView(
-            child: Column(
-              spacing: 10,
-              children: [
-                LessonWidget(
-                  mainText: "Основы ПИ",
-                  testColor: Colors.yellow,
-                  testAud: "3-419",
-                  testPrepod: "Ровенская А И",
-                  testProgress: 0.5,
-                  testTime: "Еще 40 минут",
-                  testType: "Лабораторная",
+          bottomNavigationBar: !_smallScreen
+              ? null
+              : NavigationBar(
+                  destinations: const <Widget>[
+                    NavigationDestination(
+                      icon: Icon(Icons.schedule),
+                      label: "Расписание",
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.notes),
+                      label: "Заметки???",
+                    ),
+                  ],
+                  selectedIndex: _selectedScreen,
+                  onDestinationSelected: (value) => {
+                    setState(() {
+                      _selectedScreen = value;
+                    }),
+                  },
                 ),
-                LessonWidget(
-                  mainText: "Деловые коммуникации",
-                  testColor: Colors.green,
-                  testAud: "6-718",
-                  testPrepod: "Петухова Т В",
-                  testProgress: -1,
-                  testTime: "10:00-11:20",
-                  testType: "Практика",
-                ),
-                LessonWidget(
-                  mainText: "Высшая математика",
-                  testColor: Colors.green,
-                  testAud: "6-601",
-                  testPrepod: "Анкилов А В",
-                  testProgress: -1,
-                  testTime: "11:30-12:50",
-                  testType: "Практика",
-                ),
-                LessonWidget(
-                  mainText: "Иностранный язык",
-                  testColor: Colors.green,
-                  testAud: "6-817",
-                  testPrepod: "Сытник Ю А",
-                  testProgress: -1,
-                  testTime: "13:30-14:50",
-                  testType: "Практика",
-                ),
-                LessonWidget(
-                  mainText: "Основы информационных технологий",
-                  testColor: Colors.orange,
-                  testAud: "6-817",
-                  testPrepod: "Эгов Е Н",
-                  testProgress: -1,
-                  testTime: "15:00-16:20",
-                  testType: "Лекция",
-                ),
-              ],
-            ),
+          body: Row(
+            children: [
+              _smallScreen
+                  ? Text("")
+                  : NavigationRail(
+                      labelType: NavigationRailLabelType.all,
+                      destinations: const <NavigationRailDestination>[
+                        NavigationRailDestination(
+                          icon: Icon(Icons.schedule),
+                          label: Text("Расписание"),
+                        ),
+                        NavigationRailDestination(
+                          icon: Icon(Icons.notes),
+                          label: Text("Заметки????"),
+                        ),
+                      ],
+                      selectedIndex: _selectedScreen,
+                      onDestinationSelected: (value) {
+                        setState(() {
+                          _selectedScreen = value;
+                        });
+                      },
+                    ),
+              Expanded(
+                child: IndexedStack(index: _selectedScreen, children: _screens),
+              ),
+            ],
           ),
         );
       },
@@ -165,5 +165,125 @@ class _MainState extends State<Main> {
         );
       },
     );
+  }
+}
+
+class ScheduleScreen extends StatefulWidget {
+  const ScheduleScreen({super.key});
+
+  @override
+  State<ScheduleScreen> createState() => _ScheduleScreenState();
+}
+
+class _ScheduleScreenState extends State<ScheduleScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Stack(
+        children: [
+          Column(
+            spacing: 10,
+            children: [
+              TextField(),
+              LessonWidget(
+                mainText: "Основы ПИ",
+                testColor: Colors.yellow,
+                testAud: "3-419",
+                testPrepod: "Ровенская А И",
+                testProgress: 0.5,
+                testTime: "Еще 40 минут",
+                testType: "Лабораторная",
+              ),
+              LessonWidget(
+                mainText: "Основы ПИ",
+                testColor: Colors.yellow,
+                testAud: "3-419",
+                testPrepod: "Ровенская А И",
+                testProgress: 0.5,
+                testTime: "Еще 40 минут",
+                testType: "Лабораторная",
+              ),
+              LessonWidget(
+                mainText: "Основы ПИ",
+                testColor: Colors.yellow,
+                testAud: "3-419",
+                testPrepod: "Ровенская А И",
+                testProgress: 0.5,
+                testTime: "Еще 40 минут",
+                testType: "Лабораторная",
+              ),
+              LessonWidget(
+                mainText: "Основы ПИ",
+                testColor: Colors.yellow,
+                testAud: "3-419",
+                testPrepod: "Ровенская А И",
+                testProgress: 0.5,
+                testTime: "Еще 40 минут",
+                testType: "Лабораторная",
+              ),
+              LessonWidget(
+                mainText: "Основы ПИ",
+                testColor: Colors.yellow,
+                testAud: "3-419",
+                testPrepod: "Ровенская А И",
+                testProgress: 0.5,
+                testTime: "Еще 40 минут",
+                testType: "Лабораторная",
+              ),
+              LessonWidget(
+                mainText: "Основы ПИ",
+                testColor: Colors.yellow,
+                testAud: "3-419",
+                testPrepod: "Ровенская А И",
+                testProgress: 0.5,
+                testTime: "Еще 40 минут",
+                testType: "Лабораторная",
+              ),
+              LessonWidget(
+                mainText: "Основы ПИ",
+                testColor: Colors.yellow,
+                testAud: "3-419",
+                testPrepod: "Ровенская А И",
+                testProgress: 0.5,
+                testTime: "Еще 40 минут",
+                testType: "Лабораторная",
+              ),
+              LessonWidget(
+                mainText: "Основы ПИ",
+                testColor: Colors.yellow,
+                testAud: "3-419",
+                testPrepod: "Ровенская А И",
+                testProgress: 0.5,
+                testTime: "Еще 40 минут",
+                testType: "Лабораторная",
+              ),
+              LessonWidget(
+                mainText: "Основы ПИ",
+                testColor: Colors.yellow,
+                testAud: "3-419",
+                testPrepod: "Ровенская А И",
+                testProgress: 0.5,
+                testTime: "Еще 40 минут",
+                testType: "Лабораторная",
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class NotesScreen extends StatefulWidget {
+  const NotesScreen({super.key});
+
+  @override
+  State<NotesScreen> createState() => _NotesScreenState();
+}
+
+class _NotesScreenState extends State<NotesScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [Text("data")]);
   }
 }
