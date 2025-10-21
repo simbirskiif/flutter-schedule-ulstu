@@ -1,3 +1,5 @@
 {
-    "cmake.ignoreCMakeListsMissing": true
+    "cmake.ignoreCMakeListsMissing": true,
+    "commentTranslate.hover.enabled": true,
+    "commentTranslate.targetLanguage": "ru"
 }

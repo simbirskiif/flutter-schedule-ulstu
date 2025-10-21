@@ -28,6 +28,8 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  flutter_localizations:
+    sdk: flutter
   flutter:
     sdk: flutter
 
@@ -37,6 +39,9 @@ dependencies:
   system_theme: ^3.1.2
   dynamic_color: ^1.8.1
   marquee: ^2.3.0
+  expressive_loading_indicator: ^0.0.1
+  expressive_refresh: ^0.1.2
+  table_calendar: ^3.2.0
 
 dev_dependencies:
   flutter_test:
