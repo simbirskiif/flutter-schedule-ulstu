@@ -15,6 +15,7 @@ import 'package:system_theme/system_theme.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:timetable/chill_widget.dart' hide Colors;
 import 'package:timetable/lesson_widget.dart';
+import 'package:timetable/utils/filter.dart';
 import 'package:timetable/utils/lessons.dart';
 
 void main() {
@@ -89,7 +90,12 @@ class _MainState extends State<Main> {
                         TextButton(
                           onPressed: () {
                             final d = decodeJSON(controller.text);
-                            for (final l in d) {
+                            List<Lesson> less = converDumpToLessons(d);
+                            less = getLessonsByFilter(
+                              Filter(dateTime: DateTime.now()),
+                              less,
+                            );
+                            for (final l in less) {
                               debugPrint(l.toString());
                             }
                           },
@@ -228,6 +234,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   PageController _pageController = PageController(initialPage: 0);
   late final List<DateTime> _days;
   int _currentPage = 0;
+  // DateTime a = DateTime(2024);
 
   // DateTime _focusedDay = DateTime.now();
   DateTime today = DateTime.now();
@@ -331,7 +338,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   physics: AlwaysScrollableScrollPhysics(),
                   itemCount: 20,
                   itemBuilder: (_, i) {
-                    return ListTile(title: Text("Page: $_currentPage,Element: $i"));
+                    return ListTile(
+                      title: Text("Page: $_currentPage,Element: $i"),
+                    );
                   },
                 ),
               );

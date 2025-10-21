@@ -1,22 +1,23 @@
 // ignore_for_file: file_names, deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:timetable/lesson_type_widget.dart';
+import 'package:timetable/utils/lessons.dart';
 
 class LessonWidget extends StatelessWidget {
   final double maxWidth = 650;
-  final String mainText;
+  final String name;
   final Color testColor;
   final String testTime;
-  final String testAud;
+  final String room;
   final double testProgress;
   final String testPrepod;
   final String testType;
   const LessonWidget({
     super.key,
-    required this.mainText,
+    required this.name,
     required this.testColor,
     required this.testTime,
-    required this.testAud,
+    required this.room,
     required this.testProgress,
     required this.testPrepod,
     required this.testType,
@@ -74,7 +75,7 @@ class LessonWidget extends StatelessWidget {
                                         ),
                                       ),
                                       TextSpan(
-                                        text: mainText,
+                                        text: name,
                                         style: TextStyle(color: textColor),
                                       ),
                                     ],
@@ -120,7 +121,7 @@ class LessonWidget extends StatelessWidget {
                                       child: Align(
                                         alignment: AlignmentGeometry.centerLeft,
                                         child: Text(
-                                          testAud,
+                                          room,
                                           style: TextStyle(color: textColor),
                                         ),
                                       ),
@@ -189,5 +190,34 @@ class LessonWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+Color lessonTypeColor(BuildContext context, LessonTypes type) {
+  final baseColor = Theme.of(context).colorScheme.primary;
+
+  final hsl = HSLColor.fromColor(baseColor);
+
+  switch (type) {
+    case LessonTypes.lecture:
+      return hsl.withHue((hsl.hue + 0) % 360).toColor();
+    case LessonTypes.practice:
+      return hsl.withHue((hsl.hue + 60) % 360).toColor();
+    case LessonTypes.seminar:
+      return hsl.withHue((hsl.hue + 120) % 360).toColor();
+  }
+}
+
+Color textColorForLesson(BuildContext context, Lesson lesson) {
+  final blockColor = lessonTypeColor(context, lesson.lessonType);
+  final backgroundColor = Theme.of(context).colorScheme.secondaryContainer;
+
+  final contrast =
+      blockColor.computeLuminance() - backgroundColor.computeLuminance();
+
+  if (contrast < 0.0) {
+    return Colors.white;
+  } else {
+    return Colors.black;
   }
 }
