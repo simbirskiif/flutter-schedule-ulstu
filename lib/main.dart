@@ -352,6 +352,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 }
 
+class Note {
+  String title;
+  String content;
+  Note(this.title, this.content);
+}
+
 class NotesScreen extends StatefulWidget {
   const NotesScreen({super.key});
 
@@ -365,6 +371,8 @@ class _NotesScreenState extends State<NotesScreen> {
     await Future.delayed(Duration(seconds: Random().nextInt(10)));
   }
 
+  List<Note> notes = [Note("12", "12")];
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -375,14 +383,37 @@ class _NotesScreenState extends State<NotesScreen> {
             _key.currentState?.show();
           },
         ),
+        TextButton(
+          style: TextButton.styleFrom(foregroundColor: Colors.blue),
+          onPressed: () {
+            setState(() {
+              String text = (notes.length + 1).toString();
+              notes.add(Note(text, ""));
+            });
+          },
+          child: Text('Добавить заметку'),
+        ),
         Expanded(
           child: ExpressiveRefreshIndicator(
             key: _key,
             onRefresh: _onRefresh,
             child: ListView.builder(
               physics: AlwaysScrollableScrollPhysics(),
-              itemCount: 20,
-              itemBuilder: (_, i) => ListTile(title: Text("Element: $i")),
+              itemCount: notes.length,
+              itemBuilder: (_, i) => ListTile(
+                title: TextFormField(
+                  initialValue: notes[i].title,
+                  onChanged: (text) {
+                    notes[i].title = text;
+                  },
+                ),
+                subtitle: TextFormField(
+                  initialValue: notes[i].content,
+                  onChanged: (text) {
+                    notes[i].content = text;
+                  },
+                ),
+              ),
             ),
           ),
         ),
