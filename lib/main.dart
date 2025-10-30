@@ -92,7 +92,7 @@ class _MainState extends State<Main> {
                             final d = decodeJSON(controller.text);
                             List<Lesson> less = converDumpToLessons(d);
                             less = getLessonsByFilter(
-                              Filter(dateTime: DateTime.now()),
+                              Filter(),
                               less,
                             );
                             for (final l in less) {
