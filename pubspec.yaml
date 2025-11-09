@@ -42,6 +42,9 @@ dependencies:
   expressive_loading_indicator: ^0.0.1
   expressive_refresh: ^0.1.2
   table_calendar: ^3.2.0
+  progress_indicator_m3e: ^0.1.1
+  intl: ^0.20.2
+  animations: ^2.1.0
 
 dev_dependencies:
   flutter_test:

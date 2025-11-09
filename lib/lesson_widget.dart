@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:timetable/lesson_type_widget.dart';
 import 'package:timetable/utils/lessons.dart';
 
+@deprecated
 class LessonWidget extends StatelessWidget {
   final double maxWidth = 650;
   final String name;

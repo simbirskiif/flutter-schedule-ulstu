@@ -1,5 +1,7 @@
 {
     "cmake.ignoreCMakeListsMissing": true,
     "commentTranslate.hover.enabled": true,
-    "commentTranslate.targetLanguage": "ru"
+    "commentTranslate.targetLanguage": "ru",
+    "synthwave84.brightness": 0.45,
+    "synthwave84.disableGlow": false
 }

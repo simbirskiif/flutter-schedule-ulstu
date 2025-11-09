@@ -11,16 +11,22 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:progress_indicator_m3e/progress_indicator_m3e.dart';
 import 'package:system_theme/system_theme.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:timetable/chill_widget.dart' hide Colors;
 import 'package:timetable/lesson_widget.dart';
+import 'package:timetable/screens/notes_screen.dart';
+import 'package:timetable/screens/schedule_screen.dart';
 import 'package:timetable/utils/filter.dart';
 import 'package:timetable/utils/lessons.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   // debugPaintSizeEnabled = true;
+  // PlatformDispatcher.instance.onReportTimings = (timings) {
+  //   debugPrint('Frame timings: ${timings.length}');
+  // };
   runApp(
     DynamicColorBuilder(
       builder: (ColorScheme? light, ColorScheme? dark) {
@@ -91,10 +97,7 @@ class _MainState extends State<Main> {
                           onPressed: () {
                             final d = decodeJSON(controller.text);
                             List<Lesson> less = converDumpToLessons(d);
-                            less = getLessonsByFilter(
-                              Filter(),
-                              less,
-                            );
+                            less = getLessonsByFilter(Filter(), less);
                             for (final l in less) {
                               debugPrint(l.toString());
                             }
@@ -164,12 +167,24 @@ class _MainState extends State<Main> {
               Expanded(
                 child: IndexedStack(index: _selectedScreen, children: _screens),
               ),
+              
             ],
           ),
         );
       },
     );
   }
+
+  // double value = 0;
+  // void plus() {
+  //   setState(() {
+  //     value += 0.1;
+  //     if (value > 1) {
+  //       value = 0;
+  //       debugPrint(">0");
+  //     }
+  //   });
+  // }
 
   void showBottomSheet(BuildContext context) {
     showModalBottomSheet(
@@ -212,212 +227,20 @@ class _MainState extends State<Main> {
                     ),
                   ),
                 ),
+                // CircularProgressIndicatorM3E(value: 0.6),
+                // ElevatedButton(
+                //   onPressed: () {
+                //     debugPrint("plus");
+                //     plus();
+                //   },
+                //   child: Text("data"),
+                // ),
+                // LinearProgressIndicatorM3E(value: value),
               ],
             ),
           ),
         );
       },
-    );
-  }
-}
-
-class ScheduleScreen extends StatefulWidget {
-  const ScheduleScreen({super.key});
-
-  @override
-  State<ScheduleScreen> createState() => _ScheduleScreenState();
-}
-
-class _ScheduleScreenState extends State<ScheduleScreen> {
-  // GlobalKey<ExpressiveRefreshIndicatorState> _key = GlobalKey();
-  final GlobalKey<ExpressiveRefreshIndicatorState> refreshKey = GlobalKey();
-  PageController _pageController = PageController(initialPage: 0);
-  late final List<DateTime> _days;
-  int _currentPage = 0;
-  // DateTime a = DateTime(2024);
-
-  // DateTime _focusedDay = DateTime.now();
-  DateTime today = DateTime.now();
-  // DateTime _selectedDay = DateTime.now();
-
-  ValueNotifier<DateTime> selectedDayNotifier = ValueNotifier(DateTime.now());
-  ValueNotifier<DateTime> focusedDayNotifier = ValueNotifier(DateTime.now());
-
-  Future<void> _onRefresh() async {
-    await Future.delayed(Duration(seconds: Random().nextInt(10)));
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _days = List.generate(29, (i) {
-      return DateTime.now().subtract(Duration(days: 14)).add(Duration(days: i));
-    });
-    int initialPage = _days.indexWhere(
-      (day) =>
-          day.year == today.year &&
-          day.month == today.month &&
-          day.day == today.day,
-    );
-    if (initialPage != -1) {
-      _pageController = PageController(initialPage: initialPage);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        ValueListenableBuilder<DateTime>(
-          valueListenable: selectedDayNotifier,
-          builder: (context, selectedDay, _) {
-            return TableCalendar(
-              focusedDay: focusedDayNotifier.value,
-              selectedDayPredicate: (day) {
-                return day.year == selectedDay.year &&
-                    day.month == selectedDay.month &&
-                    day.day == selectedDay.day;
-              },
-              calendarStyle: CalendarStyle(
-                todayDecoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.secondary,
-                  shape: BoxShape.circle,
-                ),
-                selectedDecoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              firstDay: _days.first,
-              lastDay: _days.last,
-              calendarFormat: CalendarFormat.week,
-              startingDayOfWeek: StartingDayOfWeek.monday,
-              headerVisible: false,
-              locale: Localizations.localeOf(context).languageCode,
-              onDaySelected: (selectedDay, focusedDay) {
-                selectedDayNotifier.value = selectedDay;
-                focusedDayNotifier.value = focusedDay;
-                int pageIndex = _days.indexWhere((day) {
-                  return day.year == selectedDay.year &&
-                      day.month == selectedDay.month &&
-                      day.day == selectedDay.day;
-                });
-                if (pageIndex != -1) {
-                  _pageController.animateToPage(
-                    pageIndex,
-                    duration: Duration(milliseconds: 100),
-                    curve: Curves.easeInOut,
-                  );
-                }
-              },
-            );
-          },
-        ),
-        MaterialButton(
-          child: Icon(Icons.update),
-          onPressed: () {
-            refreshKey.currentState?.show();
-          },
-        ),
-        Expanded(
-          child: PageView.builder(
-            itemCount: _days.length,
-            controller: _pageController,
-            onPageChanged: (value) {
-              setState(() {
-                _currentPage = value;
-              });
-              selectedDayNotifier.value = _days[value];
-              focusedDayNotifier.value = _days[value];
-            },
-            itemBuilder: (context, index) {
-              return ExpressiveRefreshIndicator(
-                key: index == _currentPage ? refreshKey : GlobalKey(),
-                onRefresh: _onRefresh,
-                child: ListView.builder(
-                  physics: AlwaysScrollableScrollPhysics(),
-                  itemCount: 20,
-                  itemBuilder: (_, i) {
-                    return ListTile(
-                      title: Text("Page: $_currentPage,Element: $i"),
-                    );
-                  },
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class Note {
-  String title;
-  String content;
-  Note(this.title, this.content);
-}
-
-class NotesScreen extends StatefulWidget {
-  const NotesScreen({super.key});
-
-  @override
-  State<NotesScreen> createState() => _NotesScreenState();
-}
-
-class _NotesScreenState extends State<NotesScreen> {
-  final GlobalKey<ExpressiveRefreshIndicatorState> _key = GlobalKey();
-  Future<void> _onRefresh() async {
-    await Future.delayed(Duration(seconds: Random().nextInt(10)));
-  }
-
-  List<Note> notes = [Note("12", "12")];
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        MaterialButton(
-          child: Icon(Icons.update),
-          onPressed: () {
-            _key.currentState?.show();
-          },
-        ),
-        TextButton(
-          style: TextButton.styleFrom(foregroundColor: Colors.blue),
-          onPressed: () {
-            setState(() {
-              String text = (notes.length + 1).toString();
-              notes.add(Note(text, ""));
-            });
-          },
-          child: Text('Добавить заметку'),
-        ),
-        Expanded(
-          child: ExpressiveRefreshIndicator(
-            key: _key,
-            onRefresh: _onRefresh,
-            child: ListView.builder(
-              physics: AlwaysScrollableScrollPhysics(),
-              itemCount: notes.length,
-              itemBuilder: (_, i) => ListTile(
-                title: TextFormField(
-                  initialValue: notes[i].title,
-                  onChanged: (text) {
-                    notes[i].title = text;
-                  },
-                ),
-                subtitle: TextFormField(
-                  initialValue: notes[i].content,
-                  onChanged: (text) {
-                    notes[i].content = text;
-                  },
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
