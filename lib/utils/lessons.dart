@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-import 'package:timetable/lesson_type_widget.dart';
+import 'package:timetable/widgets/lesson_type_widget.dart';
 
 class Lesson {
   final int week;

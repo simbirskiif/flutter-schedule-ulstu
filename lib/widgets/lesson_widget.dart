@@ -1,9 +1,9 @@
 // ignore_for_file: file_names, deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:timetable/lesson_type_widget.dart';
+import 'package:timetable/widgets/lesson_type_widget.dart';
 import 'package:timetable/utils/lessons.dart';
 
-@deprecated
+@Deprecated("Use NewLessonWidget")
 class LessonWidget extends StatelessWidget {
   final double maxWidth = 650;
   final String name;
@@ -194,6 +194,7 @@ class LessonWidget extends StatelessWidget {
   }
 }
 
+@Deprecated("Use color_utils")
 Color lessonTypeColor(BuildContext context, LessonTypes type) {
   final baseColor = Theme.of(context).colorScheme.primary;
 
@@ -206,9 +207,12 @@ Color lessonTypeColor(BuildContext context, LessonTypes type) {
       return hsl.withHue((hsl.hue + 60) % 360).toColor();
     case LessonTypes.seminar:
       return hsl.withHue((hsl.hue + 120) % 360).toColor();
+    case LessonTypes.undefined:
+      return hsl.withHue((hsl.hue + 180) % 360).toColor();
   }
 }
 
+@Deprecated("Use color_utils")
 Color textColorForLesson(BuildContext context, Lesson lesson) {
   final blockColor = lessonTypeColor(context, lesson.lessonType);
   final backgroundColor = Theme.of(context).colorScheme.secondaryContainer;
@@ -221,4 +225,11 @@ Color textColorForLesson(BuildContext context, Lesson lesson) {
   } else {
     return Colors.black;
   }
+}
+
+@Deprecated("Use color_utils")
+Color textColorForContainer(BuildContext context, Color color) {
+  return ThemeData.estimateBrightnessForColor(color) == Brightness.dark
+      ? Colors.white
+      : Colors.black;
 }

@@ -11,11 +11,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:progress_indicator_m3e/progress_indicator_m3e.dart';
 import 'package:system_theme/system_theme.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:timetable/chill_widget.dart' hide Colors;
-import 'package:timetable/lesson_widget.dart';
+import 'package:timetable/other/debug_window.dart';
+import 'package:timetable/widgets/chill_widget.dart' hide Colors;
+import 'package:timetable/widgets/lesson_widget.dart';
 import 'package:timetable/screens/notes_screen.dart';
 import 'package:timetable/screens/schedule_screen.dart';
 import 'package:timetable/utils/filter.dart';
@@ -40,11 +42,13 @@ void main() {
           debugShowCheckedModeBanner: false,
           themeMode: ThemeMode.system,
           darkTheme: ThemeData(
+            textTheme: GoogleFonts.openSansTextTheme(),
             colorScheme: dark,
             useMaterial3: true,
             useSystemColors: true,
           ),
           theme: ThemeData(
+            textTheme: GoogleFonts.openSansTextTheme(),
             colorScheme: light,
             useSystemColors: true,
             useMaterial3: true,
@@ -77,6 +81,19 @@ class _MainState extends State<Main> {
             title: Text("Test"),
             actions: [
               // ExpressiveLoadingIndicator(),
+              MaterialButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return DebugWindow();
+                      },
+                    ),
+                  );
+                },
+                child: Icon(Icons.bug_report),
+              ),
               MaterialButton(
                 onPressed: () {
                   final controller = TextEditingController();
@@ -167,7 +184,6 @@ class _MainState extends State<Main> {
               Expanded(
                 child: IndexedStack(index: _selectedScreen, children: _screens),
               ),
-              
             ],
           ),
         );

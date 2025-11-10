@@ -29,4 +29,4 @@ class LessonTypeWidget extends StatelessWidget {
   }
 }
 
-enum LessonTypes { lecture, practice, seminar }
+enum LessonTypes { lecture, practice, seminar, undefined }

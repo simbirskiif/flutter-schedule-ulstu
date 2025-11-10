@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 
 
 class LiquidGlassRegularMedium extends StatelessWidget {
+  const LiquidGlassRegularMedium({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
+        SizedBox(
           width: 445,
           height: 160,
           child: Stack(
@@ -15,7 +17,7 @@ class LiquidGlassRegularMedium extends StatelessWidget {
               Positioned(
                 left: -26,
                 top: -26,
-                child: Container(
+                child: SizedBox(
                   width: 497,
                   height: 212,
                   child: Stack(

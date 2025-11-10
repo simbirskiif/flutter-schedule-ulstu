@@ -79,13 +79,24 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       child: Column(
                         children: [
                           SizedBox(height: 5),
-                          Text(weekDay, style: TextStyle(fontSize: 10)),
+                          Text(
+                            weekDay,
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: ColorScheme.of(
+                                context,
+                              ).onSecondaryContainer,
+                            ),
+                          ),
                           SizedBox(height: 0),
                           Text(
                             "${day.day}",
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
+                              color: ColorScheme.of(
+                                context,
+                              ).onSecondaryContainer,
                             ),
                           ),
                         ],
@@ -141,13 +152,24 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       child: Column(
                         children: [
                           SizedBox(height: 5),
-                          Text(weekDay, style: TextStyle(fontSize: 10)),
+                          Text(
+                            weekDay,
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: ColorScheme.of(
+                                context,
+                              ).onSecondaryContainer,
+                            ),
+                          ),
                           SizedBox(height: 0),
                           Text(
                             "${day.day}",
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
+                              color: ColorScheme.of(
+                                context,
+                              ).onSecondaryContainer,
                             ),
                           ),
                         ],

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:timetable/main.dart';
 import 'package:timetable/models/note.dart';
 import 'package:timetable/screens/schedule_screen.dart';
+import 'package:timetable/widgets/new_lesson_widget.dart';
 
 class NotesScreen extends StatefulWidget {
   const NotesScreen({super.key});
@@ -69,10 +70,11 @@ class _NotesScreenState extends State<NotesScreen> {
         //     ),
         //   ),
         // ),
-        Padding(
-          padding: EdgeInsetsGeometry.symmetric(horizontal: 16),
-          child: InitialCard(),
-        ),
+
+        // Padding(
+        //   padding: EdgeInsetsGeometry.symmetric(horizontal: 16),
+        //   child: InitialCard(),
+        // ),
         Padding(
           padding: EdgeInsetsGeometry.symmetric(horizontal: 16),
           child: OpenContainerTest(),
@@ -82,99 +84,98 @@ class _NotesScreenState extends State<NotesScreen> {
   }
 }
 
-class InitialCard extends StatelessWidget {
-  const InitialCard({super.key});
+// class InitialCard extends StatelessWidget {
+//   const InitialCard({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(context, _createRoute());
-      },
-      child: Center(
-        child: SizedBox(
-          width: double.infinity,
-          height: 150,
-          // color: ColorScheme.of(context).surfaceContainer,
-          child: Padding(
-            padding: EdgeInsetsGeometry.all(0),
-            child: Hero(
-              tag: "tag",
-              child: Material(
-                borderRadius: BorderRadius.circular(16),
-                color: ColorScheme.of(context).surfaceVariant,
-                child: Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Column(
-                    children: [
-                      Text(
-                        "data",
-                        style: TextStyle(color: Colors.black, fontSize: 16),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return GestureDetector(
+//       onTap: () {
+//         Navigator.push(context, _createRoute());
+//       },
+//       child: Center(
+//         child: SizedBox(
+//           width: double.infinity,
+//           height: 150,
+//           // color: ColorScheme.of(context).surfaceContainer,
+//           child: Padding(
+//             padding: EdgeInsetsGeometry.all(0),
+//             child: Hero(
+//               tag: "tag",
+//               child: Material(
+//                 borderRadius: BorderRadius.circular(16),
+//                 color: ColorScheme.of(context).surfaceVariant,
+//                 child: Padding(
+//                   padding: EdgeInsets.all(10),
+//                   child: Column(
+//                     children: [
+//                       Text(
+//                         "data",
+//                         style: TextStyle(color: Colors.black, fontSize: 16),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
-class FullScreenView extends StatelessWidget {
-  const FullScreenView({super.key});
+// class FullScreenView extends StatelessWidget {
+//   const FullScreenView({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Center(
-        child: Hero(
-          tag: "tag",
-          child: Material(
-            color: ColorScheme.of(context).surfaceVariant,
-            child: SizedBox.expand(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "data",
-                      style: TextStyle(color: Colors.black, fontSize: 48),
-                    ),
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text("Close"),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(),
+//       body: Center(
+//         child: Hero(
+//           tag: "tag",
+//           child: Material(
+//             color: ColorScheme.of(context).surfaceVariant,
+//             child: SizedBox.expand(
+//               child: Center(
+//                 child: Column(
+//                   mainAxisAlignment: MainAxisAlignment.center,
+//                   children: [
+//                     Text(
+//                       "data",
+//                       style: TextStyle(color: Colors.black, fontSize: 48),
+//                     ),
+//                     SizedBox(height: 20),
+//                     ElevatedButton(
+//                       onPressed: () {
+//                         Navigator.pop(context);
+//                       },
+//                       child: Text("Close"),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
-PageRouteBuilder _createRoute() {
-  return PageRouteBuilder(
-    // Целевой виджет
-    pageBuilder: (context, animation, secondaryAnimation) =>
-        const FullScreenView(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      return child;
-    },
-    opaque: false,
-    fullscreenDialog: true,
-    transitionDuration: const Duration(milliseconds: 500),
-  );
-}
+// PageRouteBuilder _createRoute() {
+//   return PageRouteBuilder(
+//     pageBuilder: (context, animation, secondaryAnimation) =>
+//         const FullScreenView(),
+//     transitionsBuilder: (context, animation, secondaryAnimation, child) {
+//       return child;
+//     },
+//     opaque: false,
+//     fullscreenDialog: true,
+//     transitionDuration: const Duration(milliseconds: 500),
+//   );
+// }
 
 class OpenContainerTest extends StatelessWidget {
   const OpenContainerTest({super.key});
@@ -195,24 +196,8 @@ class OpenContainerTest extends StatelessWidget {
           },
           child: SizedBox(
             width: double.infinity,
-            child: Padding(
-              padding: EdgeInsetsGeometry.symmetric(horizontal: 16),
-              child: Material(
-                borderRadius: BorderRadius.circular(16),
-                color: ColorScheme.of(context).surfaceVariant,
-                child: Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Column(
-                    children: [
-                      Text(
-                        "data",
-                        style: TextStyle(color: Colors.black, fontSize: 16),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            height: 150,
+            child: NewLessonWidget(lesson: null,),
           ),
         );
       },
