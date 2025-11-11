@@ -1,106 +1,64 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:timetable/widgets/new_lesson_widget.dart';
 
-
-
-class LiquidGlassRegularMedium extends StatelessWidget {
-  const LiquidGlassRegularMedium({super.key});
+class OpenContainerTest extends StatelessWidget {
+  const OpenContainerTest({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          width: 445,
-          height: 160,
-          child: Stack(
-            children: [
-              Positioned(
-                left: -26,
-                top: -26,
-                child: SizedBox(
-                  width: 497,
-                  height: 212,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: -50,
-                        top: -50,
-                        child: Container(
-                          width: 597,
-                          height: 312,
-                          padding: const EdgeInsets.all(76),
-                          decoration: BoxDecoration(color: Colors.white),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 445,
-                                height: 160,
-                                decoration: ShapeDecoration(
-                                  color: Colors.black,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(34),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 26,
-                        top: 31,
-                        child: Container(
-                          width: 445,
-                          height: 160,
-                          decoration: ShapeDecoration(
-                            color: Colors.black.withOpacity(
-                              0.07999999821186066,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(34),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 0,
-                top: 0,
-                child: Container(
-                  width: 445,
-                  height: 160,
-                  decoration: ShapeDecoration(
-                    color: Color(0x99F5F5F5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(34),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 0,
-                top: 0,
-                child: Container(
-                  width: 445,
-                  height: 160,
-                  decoration: ShapeDecoration(
-                    color: Colors.black.withOpacity(0.0010000000474974513),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(34),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+    return OpenContainer(
+      transitionDuration: Duration(milliseconds: 500),
+      closedElevation: 0,
+      closedShape: RoundedRectangleBorder(
+        borderRadius: BorderRadiusGeometry.circular(16),
+      ),
+      closedColor: ColorScheme.of(context).surfaceVariant,
+      closedBuilder: (context, action) {
+        return GestureDetector(
+          onTap: () {
+            action();
+          },
+          child: SizedBox(
+            width: double.infinity,
+            height: 150,
+            child: NewLessonWidget(lesson: null,),
           ),
-        ),
-      ],
+        );
+      },
+      openBuilder: (context, action) {
+        return Scaffold(
+          appBar: AppBar(),
+          body: Center(
+            child: Hero(
+              tag: "tag",
+              child: Material(
+                color: ColorScheme.of(context).surfaceVariant,
+                child: SizedBox.expand(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "data",
+                          style: TextStyle(color: Colors.black, fontSize: 48),
+                        ),
+                        SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: () {
+                            action();
+                          },
+                          child: Text("Close"),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
