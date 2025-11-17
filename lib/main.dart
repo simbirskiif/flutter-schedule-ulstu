@@ -25,16 +25,21 @@ import 'package:timetable/screens/notes_screen.dart';
 import 'package:timetable/screens/schedule_screen.dart';
 import 'package:timetable/utils/filter.dart';
 import 'package:timetable/utils/lessons.dart';
+import 'models/note.dart';
 
 void main() {
+  //Provider.debugCheckInvalidValueType = null;
   WidgetsFlutterBinding.ensureInitialized();
   // debugPaintSizeEnabled = true;
   // PlatformDispatcher.instance.onReportTimings = (timings) {
   //   debugPrint('Frame timings: ${timings.length}');
   // };
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => GroupProcessor(),
+    MultiProvider(
+      providers: [
+        ListenableProvider<GroupProcessor>.value(value: GroupProcessor()),
+        ListenableProvider<LessonNotes>.value(value: LessonNotes()),
+      ],
       child: DynamicColorBuilder(
         builder: (ColorScheme? light, ColorScheme? dark) {
           return MaterialApp(
