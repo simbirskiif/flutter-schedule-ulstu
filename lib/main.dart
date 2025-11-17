@@ -13,10 +13,13 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:progress_indicator_m3e/progress_indicator_m3e.dart';
+import 'package:provider/provider.dart';
 import 'package:system_theme/system_theme.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:timetable/models/filter.dart';
+import 'package:timetable/models/lesson.dart';
 import 'package:timetable/other/debug_window.dart';
-import 'package:timetable/widgets/chill_widget.dart' hide Colors;
+import 'package:timetable/processors/group_processor.dart';
 import 'package:timetable/widgets/lesson_widget.dart';
 import 'package:timetable/screens/notes_screen.dart';
 import 'package:timetable/screens/schedule_screen.dart';
@@ -30,32 +33,35 @@ void main() {
   //   debugPrint('Frame timings: ${timings.length}');
   // };
   runApp(
-    DynamicColorBuilder(
-      builder: (ColorScheme? light, ColorScheme? dark) {
-        return MaterialApp(
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-          ],
-          supportedLocales: const [Locale("en", ""), Locale("ru", "")],
-          locale: Locale("ru"),
-          debugShowCheckedModeBanner: false,
-          themeMode: ThemeMode.system,
-          darkTheme: ThemeData(
-            textTheme: GoogleFonts.openSansTextTheme(),
-            colorScheme: dark,
-            useMaterial3: true,
-            useSystemColors: true,
-          ),
-          theme: ThemeData(
-            textTheme: GoogleFonts.openSansTextTheme(),
-            colorScheme: light,
-            useSystemColors: true,
-            useMaterial3: true,
-          ),
-          home: Main(),
-        );
-      },
+    ChangeNotifierProvider(
+      create: (context) => GroupProcessor(),
+      child: DynamicColorBuilder(
+        builder: (ColorScheme? light, ColorScheme? dark) {
+          return MaterialApp(
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale("en", ""), Locale("ru", "")],
+            locale: Locale("ru"),
+            debugShowCheckedModeBanner: false,
+            themeMode: ThemeMode.system,
+            darkTheme: ThemeData(
+              textTheme: GoogleFonts.openSansTextTheme(),
+              colorScheme: dark,
+              useMaterial3: true,
+              useSystemColors: true,
+            ),
+            theme: ThemeData(
+              textTheme: GoogleFonts.openSansTextTheme(),
+              colorScheme: light,
+              useSystemColors: true,
+              useMaterial3: true,
+            ),
+            home: Main(),
+          );
+        },
+      ),
     ),
   );
 }
@@ -112,12 +118,15 @@ class _MainState extends State<Main> {
                         ),
                         TextButton(
                           onPressed: () {
-                            final d = decodeJSON(controller.text);
-                            List<Lesson> less = converDumpToLessons(d);
-                            less = getLessonsByFilter(Filter(), less);
-                            for (final l in less) {
-                              debugPrint(l.toString());
-                            }
+                            // final d = decodeJSON(controller.text);
+                            // List<Lesson> less = converDumpToLessons(d);
+                            // less = getLessonsByFilter(Filter(), less);
+                            // for (final l in less) {
+                            //   debugPrint(l.toString());
+                            // }
+                            final processor = context.read<GroupProcessor>();
+                            processor.updateFromRaw(controller.text);
+                            processor.setSubgroup(2);
                           },
                           child: Text("Принять"),
                         ),

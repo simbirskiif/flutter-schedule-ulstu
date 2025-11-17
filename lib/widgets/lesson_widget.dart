@@ -1,7 +1,7 @@
 // ignore_for_file: file_names, deprecated_member_use
 import 'package:flutter/material.dart';
+import 'package:timetable/models/lesson.dart';
 import 'package:timetable/widgets/lesson_type_widget.dart';
-import 'package:timetable/utils/lessons.dart';
 
 @Deprecated("Use NewLessonWidget")
 class LessonWidget extends StatelessWidget {

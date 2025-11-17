@@ -1,0 +1,126 @@
+import 'package:flutter/material.dart';
+import 'package:timetable/models/filter.dart';
+import 'package:timetable/models/lesson.dart';
+import 'package:timetable/utils/lessons.dart';
+import 'dart:math';
+
+class GroupProcessor with ChangeNotifier {
+  List<Lesson> _lessons = [];
+  String _groupName = "No name";
+  int _subgroupsCount = 0;
+  DateTime? _scheduleStartDate;
+  DateTime? _scheduleEndDate;
+  DateTime? _selectedDay;
+
+  int _currentSubgroup = 0;
+
+  GroupProcessor() {
+    _lessons = [];
+  }
+
+  List<Lesson> get lessons => List.unmodifiable(_lessons);
+  String get groupName => _groupName;
+  int get subgroupsCount => _subgroupsCount;
+  DateTime? get scheduleStartDate => _scheduleStartDate;
+  DateTime? get scheduleEndDate => _scheduleEndDate;
+  int get currentSubgroup => _currentSubgroup;
+  DateTime? get selectedDay => _selectedDay;
+
+  void setSelectedDay(DateTime day) {
+    _selectedDay = day;
+    notifyListeners();
+  }
+
+  void setSubgroup(int t) {
+    _currentSubgroup = t.abs() > _subgroupsCount ? 0 : t;
+    notifyListeners();
+  }
+
+  bool updateFromRaw(String rawJson) {
+    try {
+      final dumps = decodeJSON(rawJson);
+      final newLessons = converDumpToLessons(dumps);
+      if (newLessons.isEmpty) {
+        return false;
+      }
+      newLessons.sort((a, b) => a.dateTime.compareTo(b.dateTime));
+
+      final newStart = newLessons.first.dateTime;
+      final newEnd = newLessons.last.dateTime;
+      final newGroupName = newLessons.first.group;
+      final newSubgroupCount = newLessons.map((e) => e.subgroup).reduce(max);
+
+      _lessons = newLessons;
+      _groupName = newGroupName;
+      _scheduleStartDate = newStart;
+      _scheduleEndDate = newEnd;
+      _subgroupsCount = newSubgroupCount;
+
+      notifyListeners();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  List<Lesson> getLessonsForDay(DateTime date) {
+    var dayLessons = _getLessonsByDate(date, _lessons);
+    var filtered = _getLessonsBySubgroup(_currentSubgroup, dayLessons);
+    filtered.sort((a, b) {
+      final indexComparison = a.index.compareTo(b.index);
+      if (indexComparison != 0) {
+        return indexComparison;
+      }
+      return a.dateTime.compareTo(b.dateTime);
+    });
+    return filtered;
+  }
+
+  List<Lesson> getFilteredLessons(DateTime date, Filter filter) {
+    var filtered = _getLessonsByDate(date, _lessons);
+    filtered = _getLessonsBySubgroup(filter.subgroup, filtered);
+    filtered.sort((a, b) => a.index.compareTo(b.index));
+    return filtered;
+  }
+
+  bool _isEqualDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
+  }
+
+  List<Lesson> _getLessonsByDate(DateTime date, List<Lesson> target) {
+    return target.where((l) => _isEqualDay(l.dateTime, date)).toList();
+  }
+
+  List<Lesson> _getLessonsBySubgroup(int? s, List<Lesson> target) {
+    if (s == null) return target;
+    return target.where((l) {
+      if (s == 0) return l.subgroup == 0;
+      if (s < 0) return s.abs() == l.subgroup;
+      if (s > 0) return s == l.subgroup || l.subgroup == 0;
+      return true;
+    }).toList();
+  }
+
+  List<DateTime> get days {
+    if (_scheduleStartDate == null || _scheduleEndDate == null) {
+      return [];
+    }
+    final start = _scheduleStartDate!.subtract(Duration(days: 14));
+    final end = _scheduleEndDate!.add(Duration(days: 14));
+
+    final count = end.difference(start).inDays;
+    return List.generate(count + 1, (i) => start.add(Duration(days: i)));
+  }
+
+  int getInitialDayIndex({required DateTime today}) {
+    final todayNormalized = DateTime(today.year, today.month, today.day);
+    int index = days.indexWhere((day) {
+      return day.year == todayNormalized.year &&
+          day.month == todayNormalized.month &&
+          day.day == todayNormalized.day;
+    });
+    return index != -1 ? index : 0;
+  }
+}

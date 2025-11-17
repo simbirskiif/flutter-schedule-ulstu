@@ -1,62 +1,20 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:timetable/models/dump_lesson.dart';
+import 'package:timetable/models/lesson.dart';
 import 'package:timetable/widgets/lesson_type_widget.dart';
 
-class Lesson {
-  final int week;
-  final int day;
-  final int index;
-  final int subgroup;
-  final String group;
-  final DateTime dateTime;
-  final String teacher;
-  final String room;
-  final String nameOfLesson;
-  final bool isRemote;
-  final LessonTypes lessonType;
-  Lesson({
-    required this.week,
-    required this.day,
-    required this.index,
-    required this.subgroup,
-    required this.group,
-    required this.dateTime,
-    required this.teacher,
-    required this.room,
-    required this.nameOfLesson,
-    required this.isRemote,
-    required this.lessonType,
-  });
-  @override
-  String toString() {
-    return "Date: $dateTime, type: $lessonType, subgroup: $subgroup, group: $group, name: $nameOfLesson, teacher: $teacher, room: $room, remote: $isRemote";
-  }
-}
-
-class DumpLesson {
-  final int week;
-  final int day;
-  final int index;
-  final String group;
-  final String nameOfLesson;
-  final String teacher;
-  final String room;
-
-  DumpLesson({
-    required this.week,
-    required this.day,
-    required this.index,
-    required this.group,
-    required this.nameOfLesson,
-    required this.teacher,
-    required this.room,
-  });
-  @override
-  String toString() {
-    return "week: $week, day: $day, index: $index, group: $group, name: $nameOfLesson, teacher: $teacher, room: $room";
-  }
-}
+final pairTimes = [
+  Duration(hours: 8, minutes: 30),
+  Duration(hours: 10, minutes: 0),
+  Duration(hours: 11, minutes: 30),
+  Duration(hours: 13, minutes: 30),
+  Duration(hours: 15, minutes: 0),
+  Duration(hours: 16, minutes: 30),
+  Duration(hours: 18, minutes: 00),
+  Duration(hours: 19, minutes: 30),
+];
 
 List<DumpLesson> decodeJSON(String raw) {
   final decoded = jsonDecode(raw);
@@ -157,17 +115,6 @@ DateTime lessonDateTime(int week, int day, int index) {
   final weekStart = DateTime(startYear, 9, 1);
   final daysFromStart = (week - 1) * 7 + day;
   var date = weekStart.add(Duration(days: daysFromStart));
-
-  final pairTimes = [
-    Duration(hours: 8, minutes: 30),
-    Duration(hours: 10, minutes: 0),
-    Duration(hours: 11, minutes: 30),
-    Duration(hours: 13, minutes: 30),
-    Duration(hours: 15, minutes: 0),
-    Duration(hours: 16, minutes: 30),
-    Duration(hours: 18, minutes: 00),
-    Duration(hours: 19, minutes: 30),
-  ];
 
   final time = index < pairTimes.length ? pairTimes[index] : Duration(hours: 0);
 

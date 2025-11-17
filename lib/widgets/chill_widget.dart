@@ -50,4 +50,3 @@ class ChillWidget extends StatelessWidget {
   }
 }
 
-class Colors {}

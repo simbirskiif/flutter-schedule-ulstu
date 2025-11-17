@@ -1,12 +1,54 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:progress_indicator_m3e/progress_indicator_m3e.dart';
-import 'package:timetable/utils/lessons.dart';
+import 'package:timetable/models/lesson.dart';
+import 'package:timetable/models/relative_time.dart';
+import 'package:timetable/utils/color_utils.dart';
+import 'package:timetable/utils/lesson_time.dart';
+import 'package:timetable/utils/string_time_formatter.dart';
+import 'package:timetable/widgets/new_lesson_type_widget.dart';
 
-class NewLessonWidget extends StatelessWidget {
-  final Lesson? lesson;
+class NewLessonWidget extends StatefulWidget {
+  final Lesson lesson;
   const NewLessonWidget({super.key, required this.lesson});
+
+  @override
+  State<NewLessonWidget> createState() => _NewLessonWidgetState();
+}
+
+class _NewLessonWidgetState extends State<NewLessonWidget> {
+  var valueProgressBar = 0.0;
+  RelativeTime get relativeTime =>
+      widget.lesson.getRelativeTime(DateTime.now());
+  late String textDifference = relativeTime.status != LessonTimeStatus.complete
+      ? formatRelativeDuration(relativeTime.timeLeft!, relativeTime.status)
+      : '';
+  late Timer _timer;
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(Duration(milliseconds: 200), (timer) {
+      setState(() {
+        if (mounted) {
+          textDifference = relativeTime.status != LessonTimeStatus.complete
+              ? formatRelativeDuration(
+                  relativeTime.timeLeft!,
+                  relativeTime.status,
+                )
+              : '';
+          if (relativeTime.status == LessonTimeStatus.inProgress) {
+            valueProgressBar =
+                1 -
+                (relativeTime.timeLeft!.inSeconds /
+                    Duration(minutes: 80).inSeconds);
+          }
+        }
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,22 +75,20 @@ class NewLessonWidget extends StatelessWidget {
                           WidgetSpan(
                             child: Padding(
                               padding: EdgeInsetsGeometry.only(right: 2),
-                              child: SizedBox(
-                                width: 80,
-                                height: 16,
-                                child: Material(
-                                  color: Colors.red,
-                                  child: Text(
-                                    "Тип занятия",
-                                    style: TextStyle(fontSize: 10),
-                                  ),
-                                ),
+                              child: NewLessonTypeWidget(
+                                lessonType: widget.lesson.lessonType,
+                                subgroup: widget.lesson.subgroup,
                               ),
                             ),
                           ),
                           TextSpan(
-                            text:
-                                "Занятие Занятие Занятие Занятие Занятие Занятие Занятие ",
+                            style: TextStyle(
+                              color: textColorForContainer(
+                                context,
+                                ColorScheme.of(context).surfaceVariant,
+                              ),
+                            ),
+                            text: widget.lesson.nameOfLesson,
                           ),
                         ],
                       ),
@@ -62,7 +102,18 @@ class NewLessonWidget extends StatelessWidget {
                       flex: 3,
                       child: Row(
                         spacing: 2,
-                        children: [Icon(Icons.person), Text("Имя препода")],
+                        children: [
+                          Icon(Icons.person),
+                          Text(
+                            widget.lesson.teacher,
+                            style: TextStyle(
+                              color: textColorForContainer(
+                                context,
+                                ColorScheme.of(context).surfaceVariant,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     Expanded(
@@ -72,7 +123,15 @@ class NewLessonWidget extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text("Кабинет"),
+                            Text(
+                              widget.lesson.room,
+                              style: TextStyle(
+                                color: textColorForContainer(
+                                  context,
+                                  ColorScheme.of(context).surfaceVariant,
+                                ),
+                              ),
+                            ),
                             Icon(Icons.door_back_door_outlined),
                           ],
                         ),
@@ -85,13 +144,25 @@ class NewLessonWidget extends StatelessWidget {
                   children: [
                     Align(
                       alignment: AlignmentGeometry.centerLeft,
-                      child: Text("Еще 40 минут"),
+                      child: relativeTime.status != LessonTimeStatus.complete
+                          ? Text(
+                              textDifference,
+                              style: TextStyle(
+                                color: textColorForContainer(
+                                  context,
+                                  ColorScheme.of(context).surfaceVariant,
+                                ),
+                              ),
+                            )
+                          : SizedBox(),
                     ),
-                    LinearProgressIndicatorM3E(
-                      value: 0.6,
-                      size: LinearProgressM3ESize.s,
-                      shape: ProgressM3EShape.wavy,
-                    ),
+                    relativeTime.status == LessonTimeStatus.inProgress
+                        ? LinearProgressIndicatorM3E(
+                            value: valueProgressBar,
+                            size: LinearProgressM3ESize.s,
+                            shape: ProgressM3EShape.wavy,
+                          )
+                        : SizedBox(height: 1),
                   ],
                 ),
               ],
@@ -100,5 +171,11 @@ class NewLessonWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
   }
 }

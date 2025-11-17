@@ -1,5 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:timetable/models/lesson.dart';
+import 'package:timetable/widgets/lesson_type_widget.dart';
 import 'package:timetable/widgets/new_lesson_widget.dart';
 
 class OpenContainerTest extends StatelessWidget {
@@ -22,7 +24,21 @@ class OpenContainerTest extends StatelessWidget {
           child: SizedBox(
             width: double.infinity,
             height: 150,
-            child: NewLessonWidget(lesson: null,),
+            child: NewLessonWidget(
+              lesson: Lesson(
+                week: 12,
+                day: 2,
+                index: 5,
+                subgroup: 1,
+                group: "group",
+                dateTime: DateTime.now(),
+                teacher: "teacher",
+                room: "room",
+                nameOfLesson: "nameOfLesson",
+                isRemote: false,
+                lessonType: LessonTypes.seminar,
+              ),
+            ),
           ),
         );
       },

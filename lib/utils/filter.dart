@@ -1,13 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:timetable/utils/lessons.dart';
+import 'package:timetable/models/filter.dart';
+import 'package:timetable/models/lesson.dart';
 
-class Filter {
-  int? subgroup;
-  DateTime? dateTime;
-  Filter({this.subgroup, this.dateTime});
-}
-
-Filter f = Filter(subgroup: null);
 
 bool isEqualDay(DateTime date1, DateTime date2) {
   return date1.year == date2.year &&
