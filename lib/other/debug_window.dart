@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:navigation_bar_m3e/navigation_bar_m3e.dart';
+import 'package:timetable/api/login_manager.dart';
+import 'package:timetable/dialog/login_dialog.dart';
+import 'package:timetable/enum/login_states.dart';
 import 'package:timetable/models/lesson.dart';
 import 'package:timetable/widgets/lesson_type_widget.dart';
 import 'package:timetable/widgets/new_lesson_widget.dart';
@@ -96,22 +99,70 @@ class DebugWindow extends StatelessWidget {
                   lessonType: LessonTypes.seminar,
                 ),
               ),
-              NavigationBarM3E(
-                destinations: [
-                  NavigationDestinationM3E(
-                    icon: Icon(Icons.schedule),
-                    label: "Расписание",
-                  ),
-                  NavigationDestinationM3E(
-                    icon: Icon(Icons.note),
-                    label: "Заметки?",
-                  ),
-                ],
+              MaterialButton(
+                onPressed: () {
+                  showLoginDebug(context);
+                },
+                child: Text("Show debug login"),
+              ),
+              MaterialButton(
+                onPressed: () {
+                  showLoginDialogSecure(context);
+                },
+                child: Text("Show release login"),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  void showLoginDebug(BuildContext context) {
+    var login = "";
+    var password = "";
+    var ams = "";
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Column(
+              children: [
+                TextField(
+                  decoration: InputDecoration(labelText: "login"),
+                  onChanged: (value) {
+                    login = value;
+                  },
+                ),
+                TextField(
+                  decoration: InputDecoration(labelText: "password"),
+                  onChanged: (value) {
+                    password = value;
+                  },
+                ),
+                Center(
+                  child: FilledButton(
+                    onPressed: () async {
+                      final cookie = await LoginManager().login(
+                        login,
+                        password,
+                      );
+                      setState(() {
+                        ams = cookie.loginStates == LoginStates.ok
+                            ? cookie.ams ?? "ERR NULL[OK]"
+                            : "ERR";
+                      });
+                    },
+                    child: Text("Login"),
+                  ),
+                ),
+                Center(child: Text(ams)),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

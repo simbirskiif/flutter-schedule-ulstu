@@ -49,6 +49,8 @@ dependencies:
   toolbar_m3e: ^0.1.1
   navigation_bar_m3e: ^0.1.1
   provider: ^6.1.5+1
+  http: ^1.6.0
+  loading_indicator_m3e: ^0.1.1
 
 dev_dependencies:
   flutter_test:
