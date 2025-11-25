@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:loading_indicator_m3e/loading_indicator_m3e.dart';
-import 'package:timetable/api/login_manager.dart';
-import 'package:timetable/enum/login_states.dart';
-import 'package:timetable/models/login_state.dart';
+import 'package:provider/provider.dart';
+import 'package:timetable/api/session_manager.dart';
+import 'package:timetable/dialog/fitst_setup_dialog.dart';
+import 'package:timetable/enum/online_status.dart';
 
 void showLoginDialogSecure(BuildContext context) {
   String login = "";
@@ -120,22 +121,51 @@ void showLoginDialogSecure(BuildContext context) {
                           errorText = null;
                           isLock = true;
                         });
-                        LoginState state = await LoginManager().login(
+                        final SessionManager manager =
+                            Provider.of<SessionManager>(context, listen: false);
+                        OnlineStatus status = await manager.login(
                           login,
                           password,
                         );
                         setState(() {
-                          errorText = state.loginStates != LoginStates.ok
-                              ? state.loginStates == LoginStates.wrongPassword
-                                    ? "Неверный пароль"
-                                    : state.loginStates ==
-                                          LoginStates.connectionErr
-                                    ? "Нет интернета"
-                                    : "Произошла ошибка"
-                              : null;
-                          isLock = false;
+                          switch (status) {
+                            case OnlineStatus.ok:
+                              errorText = null;
+                              break;
+                            case OnlineStatus.connectionErr:
+                              errorText = "Нет интернета";
+                              break;
+                            case OnlineStatus.wrongPassword:
+                              errorText = "Неверный пароль";
+                              break;
+                            default:
+                              errorText = "Произошла ошибка";
+                          }
                         });
+                        isLock = false;
                         passwordController.clear();
+                        if (status == OnlineStatus.ok) {
+                          if (context.mounted) {
+                            Navigator.pop(context);
+                            showFirstSetupDialog(context);
+                          }
+                        }
+                        // LoginState state = await LoginManager.login(
+                        //   login,
+                        //   password,
+                        // );
+                        // setState(() {
+                        //   errorText = state.loginStates != OnlineStatus.ok
+                        //       ? state.loginStates == OnlineStatus.wrongPassword
+                        //             ? "Неверный пароль"
+                        //             : state.loginStates ==
+                        //                   OnlineStatus.connectionErr
+                        //             ? "Нет интернета"
+                        //             : "Произошла ошибка"
+                        //       : null;
+                        //   isLock = false;
+                        // });
+                        // passwordController.clear();
                       },
                       child: Text("Войти"),
                     ),

@@ -1,0 +1,104 @@
+import 'package:flutter/foundation.dart';
+import 'package:timetable/api/login_manager.dart';
+import 'package:timetable/api/user_data_fetch.dart';
+import 'package:timetable/enum/online_status.dart';
+import 'package:timetable/models/login_state.dart';
+
+class SessionManager with ChangeNotifier {
+  String? userName; //! login
+  String? password;
+  String? ams;
+  String? group;
+  String? name;
+  bool isLoggin = false;
+  bool fetchingData = false;
+  SessionManager();
+
+  Future<void> logout() async {
+    if (ams == null) {
+      userName = null;
+      password = null;
+      return;
+    }
+    await LoginManager.logoutIgnoreSessionErrors(ams!);
+    ams = null;
+    userName = null;
+    password = null;
+    isLoggin = false;
+    notifyListeners();
+  }
+
+  Future<void> logoutAndDropData() async {
+    await logout();
+    //TODO: wipe data
+    notifyListeners();
+  }
+
+  Future<OnlineStatus> login(String login, String password) async {
+    int iters = 5;
+    if (ams != null) {
+      return OnlineStatus.undefined;
+    }
+    LoginState state = await LoginManager.login(login, password);
+    while (iters >= 0 && state.loginStates == OnlineStatus.connectionErr) {
+      state = await LoginManager.login(login, password);
+      iters--;
+    }
+    if (state.loginStates == OnlineStatus.ok) {
+      isLoggin = true;
+      userName = login;
+      this.password = password;
+      ams = state.ams;
+    }
+    notifyListeners();
+    return state.loginStates;
+  }
+
+  Future<OnlineStatus> fetchUserData() async {
+    fetchingData = true;
+    notifyListeners();
+    var iters = 5;
+    var status = await _fetchUserData();
+    if (status == OnlineStatus.ok) {
+      notifyListeners();
+      fetchingData = false;
+      return status;
+    } else if (status == OnlineStatus.sessionErr &&
+        userName != null &&
+        password != null) {
+      await logout();
+      while (iters >= 0) {
+        status = await login(userName!, password!);
+        if (status == OnlineStatus.ok) {
+          break;
+        }
+        if (status != OnlineStatus.connectionErr) {
+          break;
+        }
+        iters--;
+      }
+    }
+    if (status != OnlineStatus.ok) {
+      fetchingData = false;
+      notifyListeners();
+      return status;
+    } else {
+      OnlineStatus s = await _fetchUserData();
+      fetchingData = false;
+      notifyListeners();
+      return s;
+    }
+  }
+
+  Future<OnlineStatus> _fetchUserData() async {
+    if (ams == null) {
+      return OnlineStatus.sessionErr;
+    }
+    UserData data = await UserDataFetch.getUserData(ams!);
+    if (data.status == OnlineStatus.ok) {
+      name = data.fullName;
+      group = data.group;
+    }
+    return data.status;
+  }
+}

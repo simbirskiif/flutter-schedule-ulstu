@@ -16,6 +16,7 @@ import 'package:progress_indicator_m3e/progress_indicator_m3e.dart';
 import 'package:provider/provider.dart';
 import 'package:system_theme/system_theme.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:timetable/api/session_manager.dart';
 import 'package:timetable/models/filter.dart';
 import 'package:timetable/models/lesson.dart';
 import 'package:timetable/other/debug_window.dart';
@@ -39,6 +40,7 @@ void main() {
       providers: [
         ListenableProvider<GroupProcessor>.value(value: GroupProcessor()),
         ListenableProvider<LessonNotes>.value(value: LessonNotes()),
+        ListenableProvider<SessionManager>.value(value: SessionManager()),
       ],
       child: DynamicColorBuilder(
         builder: (ColorScheme? light, ColorScheme? dark) {
@@ -222,6 +224,7 @@ class _MainState extends State<Main> {
       context: context,
       useRootNavigator: true,
       builder: (BuildContext context) {
+        SessionManager manager = Provider.of<SessionManager>(context);
         return Theme(
           data: Theme.of(context).copyWith(),
           child: SizedBox(
@@ -249,7 +252,7 @@ class _MainState extends State<Main> {
                             ),
                             Align(
                               alignment: Alignment.centerLeft,
-                              child: Text("Name"),
+                              child: Text(manager.name ?? manager.userName ?? "Войдите в аккаунт"),
                             ),
                           ],
                         ),

@@ -30,12 +30,12 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(Duration(milliseconds: 200), (timer) {
+    _timer = Timer.periodic(Duration(milliseconds: 500), (timer) {
       setState(() {
         if (mounted) {
           textDifference = relativeTime.status != LessonTimeStatus.complete
               ? formatRelativeDuration(
-                  relativeTime.timeLeft!,
+                  relativeTime.timeLeft ?? Duration(seconds: 0),
                   relativeTime.status,
                 )
               : '';
