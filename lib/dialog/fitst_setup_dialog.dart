@@ -36,7 +36,7 @@ class _DialogFState extends State<DialogF> {
     );
     await Future.delayed(Duration(microseconds: 5));
     isLoading = manager.fetchingData;
-    isError = !manager.isLoggin;
+    isError = !manager.loggedIn;
     if (isFirstLoad) {
       manager.fetchUserData();
       isFirstLoad = false;
@@ -57,7 +57,67 @@ class _DialogFState extends State<DialogF> {
       content: SingleChildScrollView(
         child: Stack(
           children: [
-            Column(children: [Text("data"), Text("data"), Text("data")]),
+            Column(
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      color: ColorScheme.of(context).surfaceVariant,
+                    ),
+                    child: Padding(
+                      padding: EdgeInsetsGeometry.symmetric(
+                        horizontal: 8,
+                        vertical: 8,
+                      ),
+                      child: Column(
+                        spacing: 8,
+                        children: [
+                          Padding(
+                            padding: EdgeInsetsGeometry.symmetric(
+                              horizontal: 4,
+                            ),
+                            child: Row(
+                              children: [
+                                Text(
+                                  "Group 1234567",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: ColorScheme.of(context).onSurface,
+                                  ),
+                                ),
+                                SizedBox(width: 15),
+                                Spacer(),
+                                Text(
+                                  "Type of detection",
+                                  style: TextStyle(
+                                    color: ColorScheme.of(context).onSurface,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          OutlinedButton(
+                            onPressed: () {},
+                            child: Center(
+                              child: Row(
+                                spacing: 4,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.edit),
+                                  Text("Указать вручную"),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
             manager.fetchingData
                 ? Positioned.fill(
                     child: Container(
@@ -66,7 +126,7 @@ class _DialogFState extends State<DialogF> {
                     ),
                   )
                 : Text(""),
-            !manager.isLoggin
+            !manager.loggedIn
                 ? Positioned.fill(
                     child: Container(
                       color: ColorScheme.of(context).surfaceContainerHigh,
@@ -86,10 +146,10 @@ class _DialogFState extends State<DialogF> {
       ),
       actions: [
         TextButton(onPressed: () {}, child: Text("Закрыть")),
-        !manager.fetchingData && manager.isLoggin
+        !manager.fetchingData && manager.loggedIn
             ? TextButton(onPressed: () {}, child: Text("Готово"))
             : Text(""),
-        !manager.isLoggin
+        !manager.loggedIn
             ? TextButton(onPressed: () {}, child: Text("Повторить"))
             : Text(""),
       ],

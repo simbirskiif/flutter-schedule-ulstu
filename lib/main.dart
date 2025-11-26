@@ -38,9 +38,15 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        ListenableProvider<GroupProcessor>.value(value: GroupProcessor()),
+        ChangeNotifierProvider(create: (_) => SessionManager()),
+        ChangeNotifierProxyProvider<SessionManager, GroupProcessor>(
+          create: (_) => GroupProcessor(),
+          update: (context, session, group) => group!..updateSession(session)
+          ,
+        ),
+        // ListenableProvider<GroupProcessor>.value(value: GroupProcessor()),
         ListenableProvider<LessonNotes>.value(value: LessonNotes()),
-        ListenableProvider<SessionManager>.value(value: SessionManager()),
+        // ListenableProvider<SessionManager>.value(value: SessionManager()),
       ],
       child: DynamicColorBuilder(
         builder: (ColorScheme? light, ColorScheme? dark) {
@@ -252,7 +258,11 @@ class _MainState extends State<Main> {
                             ),
                             Align(
                               alignment: Alignment.centerLeft,
-                              child: Text(manager.name ?? manager.userName ?? "Войдите в аккаунт"),
+                              child: Text(
+                                manager.name ??
+                                    manager.userName ??
+                                    "Войдите в аккаунт",
+                              ),
                             ),
                           ],
                         ),

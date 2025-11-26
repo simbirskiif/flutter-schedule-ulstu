@@ -10,7 +10,7 @@ class SessionManager with ChangeNotifier {
   String? ams;
   String? group;
   String? name;
-  bool isLoggin = false;
+  bool loggedIn = false;
   bool fetchingData = false;
   SessionManager();
 
@@ -22,16 +22,30 @@ class SessionManager with ChangeNotifier {
     }
     await LoginManager.logoutIgnoreSessionErrors(ams!);
     ams = null;
-    userName = null;
-    password = null;
-    isLoggin = false;
+    loggedIn = false;
     notifyListeners();
   }
 
   Future<void> logoutAndDropData() async {
     await logout();
+    userName = null;
+    password = null;
     //TODO: wipe data
     notifyListeners();
+  }
+
+  Future<OnlineStatus> updateAms() async {
+    if (userName == null && password == null) {
+      return OnlineStatus.undefined;
+    }
+    await logout();
+    var status = await login(userName!, password!);
+    int iter = 5;
+    while (iter >= 0 && status == OnlineStatus.connectionErr) {
+      status = await login(userName!, password!);
+      iter--;
+    }
+    return status;
   }
 
   Future<OnlineStatus> login(String login, String password) async {
@@ -41,11 +55,12 @@ class SessionManager with ChangeNotifier {
     }
     LoginState state = await LoginManager.login(login, password);
     while (iters >= 0 && state.loginStates == OnlineStatus.connectionErr) {
+      debugPrint("No connection, retry left: $iters");
       state = await LoginManager.login(login, password);
       iters--;
     }
     if (state.loginStates == OnlineStatus.ok) {
-      isLoggin = true;
+      loggedIn = true;
       userName = login;
       this.password = password;
       ams = state.ams;

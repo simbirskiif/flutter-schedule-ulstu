@@ -1,10 +1,19 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
+import 'package:timetable/api/fetch_final_response.dart';
+import 'package:timetable/api/session_manager.dart';
+import 'package:timetable/enum/online_status.dart';
 import 'package:timetable/models/filter.dart';
 import 'package:timetable/models/lesson.dart';
 import 'package:timetable/utils/lessons.dart';
 import 'dart:math';
 
+import 'package:tuple/tuple.dart';
+
 class GroupProcessor with ChangeNotifier {
+  late SessionManager _session;
   List<Lesson> _lessons = [];
   String _groupName = "No name";
   int _subgroupsCount = 0;
@@ -14,8 +23,47 @@ class GroupProcessor with ChangeNotifier {
 
   int _currentSubgroup = 0;
 
+  void updateSession(SessionManager session) {
+    _session = session;
+  }
+
   GroupProcessor() {
     _lessons = [];
+  }
+  Future<Tuple2<OnlineStatus, List<String>?>> getAllGroups() async {
+    if (!_session.loggedIn) {
+      debugPrint("sessionErr1");
+      return Tuple2(OnlineStatus.sessionErr, null);
+    }
+    final url = "https://time.ulstu.ru/api/1.0/groups";
+    Response? response = await FetchFinalResponse.fetchFinalResponse(
+      url,
+      _session.ams ?? "",
+    );
+    var status = FetchFinalResponse.getOnlineStatusByResponse(response);
+    if (status == OnlineStatus.sessionErr) {
+      debugPrint("sessionErr2");
+      await _session.updateAms();
+    }
+    response = await FetchFinalResponse.fetchFinalResponse(
+      url,
+      _session.ams ?? "",
+    );
+    status = FetchFinalResponse.getOnlineStatusByResponse(response);
+    if (status != OnlineStatus.ok) {
+      return Tuple2(status, null);
+    }
+    String raw = response!.body;
+    debugPrint(response.body);
+    dynamic decoded;
+    try {
+      decoded = jsonDecode(raw);
+    } catch (_) {
+      return Tuple2(OnlineStatus.undefined, null);
+    }
+    List<dynamic> list = decoded["response"];
+    List<String> result = list.map((e) => e.toString()).toList();
+    return Tuple2(OnlineStatus.ok, result);
   }
 
   List<Lesson> get lessons => List.unmodifiable(_lessons);

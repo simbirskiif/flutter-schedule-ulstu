@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:timetable/api/login_manager.dart';
 import 'package:timetable/api/user_data_fetch.dart';
 import 'package:timetable/dialog/fitst_setup_dialog.dart';
 import 'package:timetable/dialog/login_dialog.dart';
 import 'package:timetable/enum/online_status.dart';
 import 'package:timetable/models/lesson.dart';
+import 'package:timetable/processors/group_processor.dart';
 import 'package:timetable/widgets/lesson_type_widget.dart';
 import 'package:timetable/widgets/new_lesson_widget.dart';
 import 'package:timetable/utils/color_utils.dart';
@@ -134,89 +136,107 @@ class DebugWindow extends StatelessWidget {
       context: context,
       builder: (context) {
         TextEditingController controller = TextEditingController();
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return Column(
-              children: [
-                TextField(
-                  decoration: InputDecoration(labelText: "login"),
-                  onChanged: (value) {
-                    login = value;
-                  },
-                ),
-                TextField(
-                  decoration: InputDecoration(labelText: "password"),
-                  onChanged: (value) {
-                    password = value;
-                  },
-                ),
-                Center(
-                  child: FilledButton(
-                    onPressed: () async {
-                      final cookie = await LoginManager.login(
-                        login,
-                        password,
-                      );
-                      setState(() {
-                        ams = cookie.loginStates == OnlineStatus.ok
+        return SingleChildScrollView(
+          child: StatefulBuilder(
+            builder: (context, setState) {
+              return Column(
+                children: [
+                  TextField(
+                    decoration: InputDecoration(labelText: "login"),
+                    onChanged: (value) {
+                      login = value;
+                    },
+                  ),
+                  TextField(
+                    decoration: InputDecoration(labelText: "password"),
+                    onChanged: (value) {
+                      password = value;
+                    },
+                  ),
+                  Center(
+                    child: FilledButton(
+                      onPressed: () async {
+                        final cookie = await LoginManager.login(
+                          login,
+                          password,
+                        );
+                        setState(() {
+                          ams = cookie.loginStates == OnlineStatus.ok
+                              ? cookie.ams ?? "ERR NULL[OK]"
+                              : "ERR";
+                          dataText = cookie.toString();
+                        });
+                        controller.text = cookie.loginStates == OnlineStatus.ok
                             ? cookie.ams ?? "ERR NULL[OK]"
                             : "ERR";
-                        dataText = cookie.toString();
-                      });
-                      controller.text = cookie.loginStates == OnlineStatus.ok
-                          ? cookie.ams ?? "ERR NULL[OK]"
-                          : "ERR";
-                    },
-                    child: Text("Login"),
-                  ),
-                ),
-                Center(
-                  child: Padding(
-                    padding: EdgeInsetsGeometry.symmetric(horizontal: 15),
-                    child: TextField(
-                      controller: controller,
-                      onChanged: (value) {
-                        ams = value;
                       },
+                      child: Text("Login"),
                     ),
                   ),
-                ),
-                Center(
-                  child: Row(
-                    children: [
-                      FilledButton(
-                        onPressed: () async {
-                          UserData data = await UserDataFetch.getUserData(
-                            ams,
-                          );
-                          debugPrint(data.toString());
-                          setState(() {
-                            dataText = data.toString();
-                          });
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsetsGeometry.symmetric(horizontal: 15),
+                      child: TextField(
+                        controller: controller,
+                        onChanged: (value) {
+                          ams = value;
                         },
-                        child: Text("Get profile state"),
                       ),
-                      FilledButton(
-                        onPressed: () async {
-                          final LogoutState state = await LoginManager
-                              .logoutIgnoreSessionErrors(ams);
-                          setState(() {
-                            dataText = state.toString();
-                          });
-                          debugPrint(state.toString());
-                        },
-                        child: Text("Logout"),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsetsGeometry.symmetric(horizontal: 15),
-                  child: Text(dataText),
-                ),
-              ],
-            );
-          },
+                  Center(
+                    child: Row(
+                      children: [
+                        FilledButton(
+                          onPressed: () async {
+                            UserData data = await UserDataFetch.getUserData(
+                              ams,
+                            );
+                            debugPrint(data.toString());
+                            setState(() {
+                              dataText = data.toString();
+                            });
+                          },
+                          child: Text("Get profile state"),
+                        ),
+                        FilledButton(
+                          onPressed: () async {
+                            final LogoutState state =
+                                await LoginManager.logoutIgnoreSessionErrors(
+                                  ams,
+                                );
+                            setState(() {
+                              dataText = state.toString();
+                            });
+                            debugPrint(state.toString());
+                          },
+                          child: Text("Logout"),
+                        ),
+                        FilledButton(
+                          onPressed: () async {
+                            final processor = Provider.of<GroupProcessor>(
+                              context,
+                              listen: false,
+                            );
+                            final data = await processor.getAllGroups();
+                            setState(() {
+                              dataText = data.toString();
+                            });
+                            debugPrint(data.toString());
+                          },
+                          child: Text("Get all groups"),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsetsGeometry.symmetric(horizontal: 15),
+                    child: Text(dataText),
+                  ),
+                ],
+              );
+            },
+          ),
         );
       },
     );
