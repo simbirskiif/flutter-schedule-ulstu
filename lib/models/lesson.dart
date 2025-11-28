@@ -2,6 +2,22 @@
 
 import 'package:timetable/widgets/lesson_type_widget.dart';
 
+class LessonID {
+  final int week;
+  final int day;
+  final int index;
+  final String name;
+  LessonID(this.week, this.day, this.index, this.name);
+
+  @override
+  bool operator ==(Object other) {
+    return hashCode == other.hashCode;
+  }
+
+  @override
+  int get hashCode => Object.hash(week, day, index, name);
+}
+
 class Lesson {
   final int week;
   final int day;
@@ -31,4 +47,6 @@ class Lesson {
   String toString() {
     return "Date: $dateTime, type: $lessonType, subgroup: $subgroup, group: $group, name: $nameOfLesson, teacher: $teacher, room: $room, remote: $isRemote";
   }
+
+  LessonID get id => LessonID(week + 1, day + 1, index + 1, nameOfLesson);
 }
