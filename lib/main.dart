@@ -41,8 +41,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => SessionManager()),
         ChangeNotifierProxyProvider<SessionManager, GroupProcessor>(
           create: (_) => GroupProcessor(),
-          update: (context, session, group) => group!..updateSession(session)
-          ,
+          update: (context, session, group) => group!..updateSession(session),
         ),
         // ListenableProvider<GroupProcessor>.value(value: GroupProcessor()),
         ListenableProvider<LessonNotes>.value(value: LessonNotes()),
@@ -259,9 +258,12 @@ class _MainState extends State<Main> {
                             Align(
                               alignment: Alignment.centerLeft,
                               child: Text(
-                                manager.name ??
-                                    manager.userName ??
-                                    "Войдите в аккаунт",
+                                manager.name != null
+                                    ? "${manager.name!.split(" ")[1]} "
+                                    : manager.userName ?? "Войдите в аккаунт",
+                                style: TextStyle(
+                                  color: ColorScheme.of(context).onSurface,
+                                ),
                               ),
                             ),
                           ],
