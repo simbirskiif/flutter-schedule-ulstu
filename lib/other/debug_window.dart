@@ -10,10 +10,16 @@ import 'package:timetable/processors/group_processor.dart';
 import 'package:timetable/widgets/lesson_type_widget.dart';
 import 'package:timetable/widgets/new_lesson_widget.dart';
 import 'package:timetable/utils/color_utils.dart';
+import 'package:timetable/widgets/segmented_buttons.dart';
 
-class DebugWindow extends StatelessWidget {
+class DebugWindow extends StatefulWidget {
   const DebugWindow({super.key});
 
+  @override
+  State<DebugWindow> createState() => _DebugWindowState();
+}
+
+class _DebugWindowState extends State<DebugWindow> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,6 +125,12 @@ class DebugWindow extends StatelessWidget {
                   showFirstSetupDialog(context);
                 },
                 child: Text("Show setup dialog"),
+              ),
+              SegmentedButtons(
+                items: ["1", "2", "3", "4", "5", "6", "7", "8"],
+                onSelected: (value) {
+                  debugPrint(value.toString());
+                },
               ),
             ],
           ),

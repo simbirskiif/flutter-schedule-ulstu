@@ -279,9 +279,12 @@ class _MainState extends State<Main> {
                             Align(
                               alignment: Alignment.centerLeft,
                               child: Text(
-                                manager.name ??
-                                    manager.userName ??
-                                    "Войдите в аккаунт",
+                                manager.name != null
+                                    ? "${manager.name!.split(" ")[1]} "
+                                    : manager.userName ?? "Войдите в аккаунт",
+                                style: TextStyle(
+                                  color: ColorScheme.of(context).onSurface,
+                                ),
                               ),
                             ),
                           ],
