@@ -21,7 +21,12 @@ class ScheduleScreen extends StatefulWidget {
 class _ScheduleScreenState extends State<ScheduleScreen> {
   // GlobalKey<ExpressiveRefreshIndicatorState> _key = GlobalKey();
   final GlobalKey<ExpressiveRefreshIndicatorState> refreshKey = GlobalKey();
-  PageController _pageController = PageController(initialPage: 0);
+  //TODO: fix initital page
+  PageController _pageController = PageController(
+    initialPage: 0,
+    viewportFraction: 1,
+    keepPage: false,
+  );
   // late final List<DateTime> _days;
   int _currentPage = 0;
   // DateTime a = DateTime(2024);
@@ -248,6 +253,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         Expanded(
           child: PageView.builder(
             itemCount: days.length,
+            pageSnapping: true,
+            key: PageStorageKey("1"),
             controller: _pageController,
             onPageChanged: (value) {
               final processor = context.read<GroupProcessor>();
@@ -265,7 +272,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 edgeOffset: 0.5,
                 backgroundColor: ColorScheme.of(context).primaryContainer,
                 color: ColorScheme.of(context).onPrimaryContainer,
-                key: index == _currentPage ? refreshKey : GlobalKey(),
+                key: index == _currentPage ? refreshKey : null,
                 onRefresh: _onRefresh,
                 child: lessons.isEmpty
                     ? Center(

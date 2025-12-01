@@ -23,6 +23,7 @@ class NewLessonWidget extends StatefulWidget {
 }
 
 class _NewLessonWidgetState extends State<NewLessonWidget> {
+  bool isAnimate = false;
   var valueProgressBar = 0.0;
   RelativeTime get relativeTime =>
       widget.lesson.getRelativeTime(DateTime.now());
@@ -33,6 +34,11 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        isAnimate = true;
+      });
+    });
     _timer = Timer.periodic(Duration(milliseconds: 500), (timer) {
       setState(() {
         if (mounted) {
@@ -60,13 +66,14 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
       selector: (_, provider) => provider.getNote(widget.lesson.id),
       builder: (context, note, child) => Column(
         children: [
-          AnimatedSize(
-            duration: Duration(milliseconds: 200),
+          AnimatedSwitcher(
+            duration: isAnimate
+                ? Duration(milliseconds: 200)
+                : Duration(microseconds: 0),
             child: ConstrainedBox(
               constraints: BoxConstraints(maxWidth: 650),
               child: SizedBox(
                 width: double.infinity,
-
                 child: Material(
                   borderRadius: BorderRadius.all(Radius.circular(16)),
                   color: ColorScheme.of(context).surfaceVariant,
@@ -209,9 +216,9 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
                         ),
                         note == null
                             ? GestureDetector(
-                              onTap: () {
-                                notes.add(widget.lesson.id, context);
-                              },
+                                onTap: () {
+                                  notes.add(widget.lesson.id, context);
+                                },
                                 child: Column(
                                   children: [
                                     Divider(),
