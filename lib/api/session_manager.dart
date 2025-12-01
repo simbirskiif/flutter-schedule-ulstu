@@ -1,8 +1,12 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:timetable/api/login_manager.dart';
 import 'package:timetable/api/user_data_fetch.dart';
 import 'package:timetable/enum/online_status.dart';
 import 'package:timetable/models/login_state.dart';
+import 'package:timetable/processors/group_processor.dart';
+import 'package:timetable/models/note.dart';
+import 'package:timetable/save_system/save_system.dart';
 
 class SessionManager with ChangeNotifier {
   String? userName; //! login
@@ -11,6 +15,7 @@ class SessionManager with ChangeNotifier {
   String? group;
   String? name;
   bool loggedIn = false;
+  bool offline = false;
   bool fetchingData = false;
   bool isLoggining = false;
   SessionManager();
@@ -27,11 +32,20 @@ class SessionManager with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> logoutAndDropData() async {
+  Future<void> logoutAndDropData(
+    GroupProcessor processor,
+    LessonNotes notes,
+    SaveSystem save,
+  ) async {
     await logout();
     userName = null;
     password = null;
-    //TODO: wipe data
+    name = null;
+    group = null;
+
+    notes.clear();
+    processor.clear();
+    save.clear();
     notifyListeners();
   }
 

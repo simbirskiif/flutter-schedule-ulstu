@@ -1,5 +1,5 @@
 // ignore_for_file: unused_import, prefer_typing_uninitialized_variables, unnecessary_import, deprecated_member_use
-
+import 'dart:convert';
 import 'dart:ffi';
 import 'dart:math';
 import 'dart:ui';
@@ -20,6 +20,7 @@ import 'package:timetable/api/session_manager.dart';
 import 'package:timetable/dialog/fitst_setup_dialog.dart';
 import 'package:timetable/dialog/login_dialog.dart';
 import 'package:timetable/dialog/setup_dialog.dart';
+import 'package:timetable/enum/online_status.dart';
 import 'package:timetable/models/filter.dart';
 import 'package:timetable/models/lesson.dart';
 import 'package:timetable/other/debug_window.dart';
@@ -34,14 +35,14 @@ import 'package:timetable/models/note.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final save = SaveSystem();
-  await save.init();
+  final saveSystem = SaveSystem();
+  await saveSystem.init();
+
   final groupProcessor = GroupProcessor();
-  final json = save.loadLessons();
-  if (json != null) {
-    groupProcessor.updateFromRaw(json);
-    groupProcessor.setSubgroup(2);
-  }
+  groupProcessor.getSaveSystem(saveSystem);
+
+  final lessonNotes = LessonNotes.empty();
+  SessionManager sessionManager = SessionManager();
 
   //Provider.debugCheckInvalidValueType = null;
   // debugPaintSizeEnabled = true;
@@ -51,14 +52,14 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => SessionManager()),
+        ChangeNotifierProvider(create: (_) => sessionManager),
         ChangeNotifierProxyProvider<SessionManager, GroupProcessor>(
           create: (_) => groupProcessor,
           update: (context, session, group) => group!..updateSession(session),
         ),
         // ListenableProvider<GroupProcessor>.value(value: GroupProcessor()),
-        ListenableProvider<LessonNotes>.value(value: save.loadNotes()),
-        Provider<SaveSystem>.value(value: save),
+        ListenableProvider<LessonNotes>.value(value: lessonNotes),
+        Provider<SaveSystem>.value(value: saveSystem),
         // ListenableProvider<SessionManager>.value(value: SessionManager()),
       ],
       child: DynamicColorBuilder(
@@ -84,12 +85,79 @@ void main() async {
               useSystemColors: true,
               useMaterial3: true,
             ),
-            home: Main(),
+            home: SplashScreen(),
           );
         },
       ),
     ),
   );
+}
+
+class SplashScreen extends StatefulWidget {
+  SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _init();
+    });
+  }
+
+  Future<void> _init() async {
+    final save = context.read<SaveSystem>();
+    final session = context.read<SessionManager>();
+    final processor = context.read<GroupProcessor>();
+
+    final login = await save.getLogin();
+    final password = await save.getPassword();
+
+    if (login != null && password != null) {
+      LessonNotes lessonNotes = context.read<LessonNotes>();
+      lessonNotes = save.loadNotes();
+      final status = await session.login(login, password);
+
+      if (!mounted) return;
+
+      if (status == OnlineStatus.ok) {
+        await session.fetchUserData();
+        await processor.updateFromGroup();
+        processor.setSubgroup(save.loadSubGroup() ?? 1);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => Main()),
+        );
+
+        return;
+      } else {
+        processor.updateFromRaw(save.loadLessons() ?? "");
+        processor.setSubgroup(save.loadSubGroup() ?? 1);
+        session.offline = true;
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => Main()),
+        );
+        return;
+      }
+    }
+
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => Main()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+  }
 }
 
 class Main extends StatefulWidget {
@@ -105,6 +173,7 @@ class _MainState extends State<Main> {
   int _selectedScreen = 0;
   bool _smallScreen = true;
   final List<Widget> _screens = [ScheduleScreen(), NotesScreen()];
+
   @override
   Widget build(BuildContext context) {
     _smallScreen = MediaQuery.of(context).size.width < 650 ? true : false;
@@ -157,7 +226,7 @@ class _MainState extends State<Main> {
                             final save = context.read<SaveSystem>();
                             final processor = context.read<GroupProcessor>();
 
-                            notes.clear(context);
+                            notes.update(context);
                             save.saveLessons(controller.text);
                             processor.updateFromRaw(controller.text);
                             processor.setSubgroup(2);

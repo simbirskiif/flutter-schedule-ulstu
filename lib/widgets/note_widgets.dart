@@ -4,6 +4,7 @@ import 'package:timetable/models/lesson.dart';
 import 'package:provider/provider.dart';
 import 'package:animations/animations.dart';
 import 'package:timetable/utils/color_utils.dart';
+import 'package:timetable/utils/day_of_week_table.dart';
 
 class NoteWidget extends StatelessWidget {
   final LessonID id;
@@ -44,18 +45,32 @@ class LessonNoteView extends StatelessWidget {
           padding: EdgeInsets.only(left: 26, right: 26, top: 10, bottom: 10),
           child: Column(
             children: [
-              Selector<LessonNotes, String?>(
-                selector: (_, provider) => provider.getNote(id)?.title,
+              Selector<LessonNotes, Note?>(
+                selector: (_, provider) => provider.getNote(id),
                 builder: (context, value, child) {
-                  return Text(
-                    value ?? "",
-                    style: TextStyle(
-                      color: textColorForContainer(
-                        context,
-                        ColorScheme.of(context).surfaceVariant,
+                  return Column(
+                    children: [
+                      Text(
+                        value?.title ?? "",
+                        style: TextStyle(
+                          color: textColorForContainer(
+                            context,
+                            ColorScheme.of(context).surfaceVariant,
+                          ),
+                          fontSize: 16,
+                        ),
                       ),
-                      fontSize: 16,
-                    ),
+                      Text(
+                        '${DayOfWeekTable.get(id.day)} | ${id.index} пара',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: textColorForContainer(
+                            context,
+                            ColorScheme.of(context).surfaceVariant,
+                          ),
+                        ),
+                      ),
+                    ],
                   );
                 },
               ),
@@ -77,28 +92,25 @@ class ScheduleNoteView extends StatelessWidget {
       selector: (_, provider) => provider.getNote(id)?.content,
       builder: (context, note, child) => Padding(
         padding: EdgeInsets.only(top: 8),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 650),
-          child: SizedBox(
-            width: double.infinity,
-            height: 30,
-            child: Material(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-              color: ColorScheme.of(context).surfaceVariant,
-              child: Padding(
-                padding: EdgeInsets.only(left: 6, bottom: 6, right: 2),
-                child: Text(
-                  note ?? "",
-                  style: TextStyle(
-                    color: textColorForContainer(
-                      context,
-                      ColorScheme.of(context).surfaceVariant,
-                    ),
-                    fontSize: 15,
+        child: SizedBox(
+          width: double.infinity,
+          height: 30,
+          child: Material(
+            borderRadius: BorderRadius.all(Radius.circular(8)),
+            color: ColorScheme.of(context).surfaceVariant,
+            child: Padding(
+              padding: EdgeInsets.only(left: 6, bottom: 6, right: 2),
+              child: Text(
+                note ?? "",
+                style: TextStyle(
+                  color: textColorForContainer(
+                    context,
+                    ColorScheme.of(context).surfaceVariant,
                   ),
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.left,
+                  fontSize: 15,
                 ),
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.left,
               ),
             ),
           ),
@@ -146,8 +158,28 @@ class _FullScreenViewState extends State<_FullScreenView> {
                                 ColorScheme.of(context).surfaceVariant,
                               ),
                             ),
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                            ),
                             initialValue: title,
                             onChanged: (value) => title = value,
+                            textAlign: TextAlign.center,
+                          ),
+                          Text(
+                            '${DayOfWeekTable.get(widget.id.day)} | ${widget.id.index} пара',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: textColorForContainer(
+                                context,
+                                ColorScheme.of(context).surfaceVariant,
+                              ),
+                            ),
+                          ),
+                          Divider(
+                            color: textColorForContainer(
+                              context,
+                              ColorScheme.of(context).surfaceVariant,
+                            ),
                           ),
                           Expanded(
                             child: TextFormField(

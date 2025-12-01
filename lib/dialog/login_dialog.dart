@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:timetable/api/session_manager.dart';
 import 'package:timetable/dialog/fitst_setup_dialog.dart';
 import 'package:timetable/enum/online_status.dart';
+import 'package:timetable/save_system/save_system.dart';
 
 void showLoginDialogSecure(BuildContext context) {
   String login = "";
@@ -123,6 +124,10 @@ void showLoginDialogSecure(BuildContext context) {
                         });
                         final SessionManager manager =
                             Provider.of<SessionManager>(context, listen: false);
+                        final SaveSystem saveSystem = Provider.of<SaveSystem>(
+                          context,
+                          listen: false,
+                        );
                         OnlineStatus status = await manager.login(
                           login,
                           password,
@@ -145,6 +150,7 @@ void showLoginDialogSecure(BuildContext context) {
                         isLock = false;
                         passwordController.clear();
                         if (status == OnlineStatus.ok) {
+                          saveSystem.saveLoginPassword(login, password);
                           if (context.mounted) {
                             Navigator.pop(context);
                             showFirstSetupDialog(context);

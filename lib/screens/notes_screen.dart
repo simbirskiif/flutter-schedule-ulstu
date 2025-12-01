@@ -20,9 +20,11 @@ class NotesScreen extends StatelessWidget {
       builder: (context, keys, children) {
         return ListView.builder(
           itemCount: keys.length,
-          itemBuilder: (_, index) => NoteWidget(
-            id: keys[index],
-            closedBuilder: LessonNoteView(id: keys[index]),
+          itemBuilder: (_, index) => Align(
+            child: NoteWidget(
+              id: keys[index],
+              closedBuilder: LessonNoteView(id: keys[index]),
+            ),
           ),
         );
       },

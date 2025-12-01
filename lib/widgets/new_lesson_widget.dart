@@ -58,7 +58,7 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
         child: Selector<LessonNotes, Note?>(
           selector: (_, provider) => provider.getNote(widget.lesson.id),
           builder: (context, note, child) => Column(
-            mainAxisSize: MainAxisSize.min, 
+            mainAxisSize: MainAxisSize.min,
             children: [
               Material(
                 borderRadius: BorderRadius.circular(16),
@@ -66,8 +66,7 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
-                    mainAxisSize:
-                        MainAxisSize.min, 
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       RichText(

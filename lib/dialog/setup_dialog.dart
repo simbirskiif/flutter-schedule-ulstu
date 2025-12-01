@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timetable/api/session_manager.dart';
 import 'package:timetable/dialog/fitst_setup_dialog.dart';
+import 'package:timetable/processors/group_processor.dart';
+import 'package:timetable/models/note.dart';
+import 'package:timetable/save_system/save_system.dart';
 
 void showSetupDialog(BuildContext context) {
   showDialog(
@@ -34,7 +37,13 @@ void showSetupDialog(BuildContext context) {
                   context,
                   listen: false,
                 );
-                manager.logoutAndDropData();
+                final processor = Provider.of<GroupProcessor>(
+                  context,
+                  listen: false,
+                );
+                final notes = Provider.of<LessonNotes>(context, listen: false);
+                final save = Provider.of<SaveSystem>(context, listen: false);
+                manager.logoutAndDropData(processor, notes, save);
                 Navigator.pop(context);
               },
               label: Text("Выйти и удалить данные"),

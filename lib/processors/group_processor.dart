@@ -7,6 +7,7 @@ import 'package:timetable/api/session_manager.dart';
 import 'package:timetable/enum/online_status.dart';
 import 'package:timetable/models/filter.dart';
 import 'package:timetable/models/lesson.dart';
+import 'package:timetable/save_system/save_system.dart';
 import 'package:timetable/utils/lessons.dart';
 import 'dart:math';
 
@@ -14,6 +15,7 @@ import 'package:tuple/tuple.dart';
 
 class GroupProcessor with ChangeNotifier {
   late SessionManager _session;
+  late SaveSystem _saveSystem;
   List<Lesson> _lessons = [];
   String? _groupName;
   int _subgroupsCount = 0;
@@ -22,6 +24,21 @@ class GroupProcessor with ChangeNotifier {
   DateTime? _selectedDay;
   bool isLoading = false;
   int _currentSubgroup = 0;
+
+  void clear() {
+    _lessons = [];
+    _groupName = null;
+    _subgroupsCount = 0;
+    _scheduleStartDate = null;
+    _scheduleEndDate = null;
+    _selectedDay = null;
+    _currentSubgroup = 0;
+    notifyListeners();
+  }
+
+  void getSaveSystem(SaveSystem system) {
+    _saveSystem = system;
+  }
 
   void updateSession(SessionManager session) {
     _session = session;
@@ -55,6 +72,7 @@ class GroupProcessor with ChangeNotifier {
       return Tuple2(status, null);
     }
     String raw = response!.body;
+    _saveSystem.saveLessons(raw);
     final dumpLessons = decodeJSON(raw);
     final newLessons = converDumpToLessons(dumpLessons);
     newLessons.sort((a, b) => a.dateTime.compareTo(b.dateTime));

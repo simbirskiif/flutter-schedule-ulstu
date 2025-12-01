@@ -101,7 +101,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     final processor = context.watch<GroupProcessor>();
     final selectedDay = processor.selectedDay ?? today;
     final days = processor.days;
-    if (!context.read<SessionManager>().loggedIn) {
+    if (!context.read<SessionManager>().loggedIn &&
+        !context.read<SessionManager>().offline) {
       return Center(
         child: Column(
           spacing: 4,

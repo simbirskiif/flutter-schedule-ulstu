@@ -31,6 +31,14 @@ class LessonNotes with ChangeNotifier {
     return _notes.keys;
   }
 
+  Iterable<MapEntry<LessonID, Note>> get entries {
+    return _notes.entries;
+  }
+
+  void addAll(Iterable<MapEntry<LessonID, Note>> notes) {
+    _notes.addEntries(notes);
+  }
+
   void add(LessonID id, BuildContext context) {
     _notes[id] = Note(id.name, "");
     notifyListeners();
@@ -63,7 +71,12 @@ class LessonNotes with ChangeNotifier {
     _save(context);
   }
 
-  void clear(BuildContext context) {
+  void clear() {
+    _notes.clear();
+    notifyListeners();
+  }
+
+  void update(BuildContext context) {
     final processor = context.read<GroupProcessor>();
     Set<LessonID> listLessonID = {};
     listLessonID.addAll(processor.lessons.map((e) => e.id));
@@ -76,6 +89,10 @@ class LessonNotes with ChangeNotifier {
 
     notifyListeners();
     _save(context);
+  }
+
+  void load(LessonNotes notes) {
+    notifyListeners();
   }
 
   List<Map<String, dynamic>> toJson() {
