@@ -15,7 +15,7 @@ import 'package:tuple/tuple.dart';
 class GroupProcessor with ChangeNotifier {
   late SessionManager _session;
   List<Lesson> _lessons = [];
-  String _groupName = "No name";
+  String? _groupName;
   int _subgroupsCount = 0;
   DateTime? _scheduleStartDate;
   DateTime? _scheduleEndDate;
@@ -30,9 +30,43 @@ class GroupProcessor with ChangeNotifier {
   GroupProcessor() {
     _lessons = [];
   }
+  Future<Tuple2<OnlineStatus, List<Lesson>?>> getLessonsByGroup(
+    String group,
+  ) async {
+    if (!_session.loggedIn) {
+      return Tuple2(OnlineStatus.sessionErr, null);
+    }
+    final url = "https://time.ulstu.ru/api/1.0/timetable?filter=$group"
+        .replaceAll(" ", "%20");
+    Response? response = await FetchFinalResponse.fetchFinalResponse(
+      url,
+      _session.ams ?? "",
+    );
+    var status = FetchFinalResponse.getOnlineStatusByResponse(response);
+    if (status == OnlineStatus.sessionErr) {
+      await _session.updateAms();
+    }
+    response = await FetchFinalResponse.fetchFinalResponse(
+      url,
+      _session.ams ?? "",
+    );
+    status = FetchFinalResponse.getOnlineStatusByResponse(response);
+    if (status != OnlineStatus.ok) {
+      return Tuple2(status, null);
+    }
+    String raw = response!.body;
+    final dumpLessons = decodeJSON(raw);
+    final newLessons = converDumpToLessons(dumpLessons);
+    newLessons.sort((a, b) => a.dateTime.compareTo(b.dateTime));
+    return Tuple2(OnlineStatus.ok, newLessons);
+  }
+
+  static int getSubgroupCount(List<Lesson> list) {
+    return list.map((e) => e.subgroup).reduce(max);
+  }
+
   Future<Tuple2<OnlineStatus, List<String>?>> getAllGroups() async {
     if (!_session.loggedIn) {
-      debugPrint("sessionErr1");
       return Tuple2(OnlineStatus.sessionErr, null);
     }
     final url = "https://time.ulstu.ru/api/1.0/groups";
@@ -42,7 +76,6 @@ class GroupProcessor with ChangeNotifier {
     );
     var status = FetchFinalResponse.getOnlineStatusByResponse(response);
     if (status == OnlineStatus.sessionErr) {
-      debugPrint("sessionErr2");
       await _session.updateAms();
     }
     response = await FetchFinalResponse.fetchFinalResponse(
@@ -67,7 +100,7 @@ class GroupProcessor with ChangeNotifier {
   }
 
   List<Lesson> get lessons => List.unmodifiable(_lessons);
-  String get groupName => _groupName;
+  String? get groupName => _groupName;
   int get subgroupsCount => _subgroupsCount;
   DateTime? get scheduleStartDate => _scheduleStartDate;
   DateTime? get scheduleEndDate => _scheduleEndDate;

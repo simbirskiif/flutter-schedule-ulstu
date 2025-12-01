@@ -124,48 +124,53 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
                               ],
                             ),
                           ),
-                          Expanded(
-                            flex: 1,
-                            child: Align(
-                              alignment: AlignmentGeometry.centerRight,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Opacity(
-                                    opacity: note == null ? 1.0 : 0.0,
-                                    child: ElevatedButton(
-                                      onPressed: note == null
-                                          ? () {
-                                              notes.add(
-                                                widget.lesson.id,
-                                                context,
-                                              );
-                                            }
-                                          : null,
-                                      style: ElevatedButton.styleFrom(
-                                        elevation: 0.0,
-                                        backgroundColor: ColorScheme.of(
-                                          context,
-                                        ).surfaceVariant,
-                                      ),
-                                      child: Text(
-                                        '+',
-                                        style: TextStyle(fontSize: 22),
-                                      ),
+                          Align(
+                            alignment: AlignmentGeometry.centerRight,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (note == null)
+                                  IconButton(
+                                    onPressed: () {
+                                      notes.add(widget.lesson.id, context);
+                                    },
+                                    icon: Icon(Icons.add),
+                                  )
+                                ,
+                                // Opacity(
+                                //   opacity: note == null ? 1.0 : 0.0,
+                                //   child: ElevatedButton(
+                                //     onPressed: note == null
+                                //         ? () {
+                                //             notes.add(
+                                //               widget.lesson.id,
+                                //               context,
+                                //             );
+                                //           }
+                                //         : null,
+                                //     style: ElevatedButton.styleFrom(
+                                //       elevation: 0.0,
+                                //       backgroundColor: ColorScheme.of(
+                                //         context,
+                                //       ).surfaceVariant,
+                                //     ),
+                                //     child: Text(
+                                //       '+',
+                                //       style: TextStyle(fontSize: 22),
+                                //     ),
+                                //   ),
+                                // ),
+                                Text(
+                                  widget.lesson.room,
+                                  style: TextStyle(
+                                    color: textColorForContainer(
+                                      context,
+                                      ColorScheme.of(context).surfaceVariant,
                                     ),
                                   ),
-                                  Text(
-                                    widget.lesson.room,
-                                    style: TextStyle(
-                                      color: textColorForContainer(
-                                        context,
-                                        ColorScheme.of(context).surfaceVariant,
-                                      ),
-                                    ),
-                                  ),
-                                  Icon(Icons.door_back_door_outlined),
-                                ],
-                              ),
+                                ),
+                                Icon(Icons.door_back_door_outlined),
+                              ],
                             ),
                           ),
                         ],

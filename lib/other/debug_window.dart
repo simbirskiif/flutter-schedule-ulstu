@@ -1,3 +1,4 @@
+import 'package:button_m3e/button_m3e.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timetable/api/login_manager.dart';
@@ -22,6 +23,10 @@ class DebugWindow extends StatefulWidget {
 class _DebugWindowState extends State<DebugWindow> {
   @override
   Widget build(BuildContext context) {
+    GroupProcessor groupProcessor = Provider.of<GroupProcessor>(
+      context,
+      listen: false,
+    );
     return Scaffold(
       appBar: AppBar(title: Text("Test")),
       body: SingleChildScrollView(
@@ -131,6 +136,16 @@ class _DebugWindowState extends State<DebugWindow> {
                 onSelected: (value) {
                   debugPrint(value.toString());
                 },
+              ),
+              ButtonM3E(
+                onPressed: () async {
+                  final zalupa = await groupProcessor.getLessonsByGroup("Подготовительные курсы");
+                  debugPrint(zalupa.toString());
+                  debugPrint(
+                    GroupProcessor.getSubgroupCount(zalupa.item2!).toString(),
+                  );
+                },
+                label: Text("Получить занятия"),
               ),
             ],
           ),

@@ -4,6 +4,7 @@ import 'package:loading_indicator_m3e/loading_indicator_m3e.dart';
 import 'package:provider/provider.dart';
 import 'package:timetable/api/session_manager.dart';
 import 'package:timetable/dialog/manual_group_select.dart';
+import 'package:timetable/processors/group_processor.dart';
 import 'package:timetable/widgets/segmented_buttons.dart';
 
 void showFirstSetupDialog(BuildContext context) {
@@ -30,6 +31,9 @@ class _FirstSetupDialogState extends State<FirstSetupDialog> {
   bool isFirstLoad = true;
   bool isLoading = true;
   bool isError = false;
+  bool isErrorLoadGroups = false;
+  bool isLoadingGroups = true;
+  int subgroupsCount = 0;
   String? group;
   @override
   void didChangeDependencies() async {
@@ -45,12 +49,57 @@ class _FirstSetupDialogState extends State<FirstSetupDialog> {
       await manager.fetchUserData();
       isFirstLoad = false;
       group = manager.group;
+      await loadSubgroups();
     }
+  }
+
+  Future<void> loadSubgroups() async {
+    if (mounted) {
+      setState(() {
+        isErrorLoadGroups = false;
+        isLoadingGroups = true;
+      });
+    }
+    GroupProcessor processor = Provider.of<GroupProcessor>(
+      context,
+      listen: false,
+    );
+    SessionManager manager = Provider.of<SessionManager>(
+      context,
+      listen: false,
+    );
+    if (group != null) {
+      final temp = await processor.getLessonsByGroup(group!);
+      if (temp.item2 != null) {
+        try {
+          subgroupsCount = GroupProcessor.getSubgroupCount(temp.item2!);
+          debugPrint(subgroupsCount.toString());
+          if (mounted) {
+            setState(() {
+              subgroupsCount = subgroupsCount;
+              isErrorLoadGroups = false;
+              isLoadingGroups = false;
+            });
+          }
+          return;
+        } catch (_) {
+          if (mounted) {
+            setState(() {
+              isErrorLoadGroups = true;
+              isLoadingGroups = false;
+            });
+          }
+        }
+      }
+    }
+    isErrorLoadGroups = true;
+    isLoadingGroups = false;
   }
 
   @override
   Widget build(BuildContext context) {
     SessionManager manager = Provider.of<SessionManager>(context);
+    GroupProcessor processor = Provider.of<GroupProcessor>(context);
     return AlertDialog(
       title: Text(
         manager.name != null
@@ -146,11 +195,13 @@ class _FirstSetupDialogState extends State<FirstSetupDialog> {
                                                   context,
                                                   currentSelect: group,
                                                 );
-                                            setState(() {
-                                              if (thisGroup != null) {
+                                            if (thisGroup != null) {
+                                              setState(() {
                                                 group = thisGroup;
-                                              }
-                                            });
+                                              });
+                                              group = thisGroup;
+                                              await loadSubgroups();
+                                            }
                                           },
                                           icon: Icon(Icons.edit),
                                           label: Text("Изменить"),
@@ -168,38 +219,102 @@ class _FirstSetupDialogState extends State<FirstSetupDialog> {
                               horizontal: 8,
                               vertical: 4,
                             ),
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 2,
-                                  ),
-                                  child: Row(
+                            child: isLoadingGroups
+                                ? Padding(
+                                    padding: EdgeInsetsGeometry.symmetric(
+                                      vertical: 4,
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        LoadingIndicatorM3E(),
+                                        Text(
+                                          "Подождите..",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: ColorScheme.of(
+                                              context,
+                                            ).onSurface,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : isErrorLoadGroups
+                                ? Container(
+                                    color: ColorScheme.of(
+                                      context,
+                                    ).surfaceContainerHigh,
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Center(child: Icon(Icons.error)),
+                                          Text(
+                                            "Произошла ошибка",
+                                            style: TextStyle(
+                                              color: ColorScheme.of(
+                                                context,
+                                              ).onSurface,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                : subgroupsCount > 0
+                                ? Column(
                                     children: [
-                                      Text(
-                                        "Выбрать подгруппу:",
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                          color: ColorScheme.of(
-                                            context,
-                                          ).onSurface,
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 2,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              "Выбрать подгруппу:",
+                                              textAlign: TextAlign.left,
+                                              style: TextStyle(
+                                                color: ColorScheme.of(
+                                                  context,
+                                                ).onSurface,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
+                                      SegmentedButtons(
+                                        items: [
+                                          for (
+                                            var n = 1;
+                                            n <= subgroupsCount;
+                                            n++
+                                          )
+                                            n.toString(),
+                                        ],
+                                        onSelected: (value) {
+                                          debugPrint(value.toString());
+                                        },
+                                      ),
                                     ],
+                                  )
+                                : Center(
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      spacing: 4,
+                                      children: [
+                                        Icon(Icons.info),
+                                        Text(
+                                          "Для этой группы нет подгрупп",
+                                          style: TextStyle(
+                                            color: ColorScheme.of(
+                                              context,
+                                            ).onSurface,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                Builder(
-                                  builder: (context) {
-                                    return SegmentedButtons(
-                                      items: ["1", "2", "3"],
-                                      onSelected: (value) {
-                                        debugPrint(value.toString());
-                                      },
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
                           ),
                         ],
                       ),
@@ -209,7 +324,12 @@ class _FirstSetupDialogState extends State<FirstSetupDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () {}, child: Text("Закрыть")),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text("Закрыть"),
+        ),
         !manager.fetchingData && manager.loggedIn
             ? TextButton(onPressed: () {}, child: Text("Готово"))
             : Text(""),
