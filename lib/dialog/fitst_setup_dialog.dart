@@ -304,7 +304,7 @@ class _FirstSetupDialogState extends State<FirstSetupDialog> {
                                       children: [
                                         Icon(Icons.info),
                                         Text(
-                                          "Для этой группы нет подгрупп",
+                                          "У этой группы нет подгрупп",
                                           style: TextStyle(
                                             color: ColorScheme.of(
                                               context,
@@ -331,7 +331,7 @@ class _FirstSetupDialogState extends State<FirstSetupDialog> {
           child: Text("Закрыть"),
         ),
         !manager.fetchingData && manager.loggedIn
-            ? TextButton(onPressed: () {}, child: Text("Готово"))
+            ? TextButton(onPressed: () {}, child: Text("Сохранить"))
             : Text(""),
         !manager.loggedIn
             ? TextButton(

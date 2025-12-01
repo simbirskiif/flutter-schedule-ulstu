@@ -13,7 +13,7 @@ class NoteWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 8, right: 8, bottom: 0, top: 4),
+      padding: const EdgeInsets.only(top: 4),
       child: OpenContainer(
         transitionDuration: Duration(milliseconds: 500),
         closedElevation: 0,
