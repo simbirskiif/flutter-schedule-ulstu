@@ -16,16 +16,24 @@ void showSetupDialog(BuildContext context) {
           children: [
             ButtonM3E(
               onPressed: () {
-                showFirstSetupDialog(context);
                 Navigator.pop(context);
+                showFirstSetupDialog(context);
               },
-              label: Text("Перейти к выбору группы и подгруппы"),
+              label: Text(
+                "Перейти к выбору группы и подгруппы",
+                softWrap: true,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
               icon: Icon(Icons.edit),
               style: ButtonM3EStyle.filled,
             ),
             ButtonM3E(
               onPressed: () {
-                final manager = Provider.of<SessionManager>(context, listen: false);
+                final manager = Provider.of<SessionManager>(
+                  context,
+                  listen: false,
+                );
                 manager.logoutAndDropData();
                 Navigator.pop(context);
               },
