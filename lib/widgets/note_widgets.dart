@@ -3,6 +3,7 @@ import 'package:timetable/models/note.dart';
 import 'package:timetable/models/lesson.dart';
 import 'package:provider/provider.dart';
 import 'package:animations/animations.dart';
+import 'package:timetable/utils/color_utils.dart';
 
 class NoteWidget extends StatelessWidget {
   final LessonID id;
@@ -17,7 +18,7 @@ class NoteWidget extends StatelessWidget {
         transitionDuration: Duration(milliseconds: 500),
         closedElevation: 0,
         closedShape: RoundedRectangleBorder(
-          borderRadius: BorderRadiusGeometry.circular(8),
+          borderRadius: BorderRadius.circular(8),
         ),
         closedColor: ColorScheme.of(context).surfaceVariant,
         closedBuilder: (context, action) =>
@@ -29,31 +30,32 @@ class NoteWidget extends StatelessWidget {
   }
 }
 
-class GeneralNoteView extends StatefulWidget {
+class LessonNoteView extends StatelessWidget {
   final LessonID id;
-  const GeneralNoteView({super.key, required this.id});
+  const LessonNoteView({super.key, required this.id});
 
-  @override
-  State<GeneralNoteView> createState() => _GeneralNoteViewState();
-}
-
-class _GeneralNoteViewState extends State<GeneralNoteView> {
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: Padding(
-        padding: EdgeInsetsGeometry.symmetric(horizontal: 16),
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: 650),
+      child: SizedBox(
+        width: double.infinity,
         child: Padding(
-          padding: EdgeInsets.all(10),
+          padding: EdgeInsets.only(left: 26, right: 26, top: 10, bottom: 10),
           child: Column(
             children: [
               Selector<LessonNotes, String?>(
-                selector: (_, provider) => provider.getNote(widget.id)?.title,
+                selector: (_, provider) => provider.getNote(id)?.title,
                 builder: (context, value, child) {
                   return Text(
                     value ?? "",
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    style: TextStyle(
+                      color: textColorForContainer(
+                        context,
+                        ColorScheme.of(context).surfaceVariant,
+                      ),
+                      fontSize: 16,
+                    ),
                   );
                 },
               ),
@@ -65,47 +67,51 @@ class _GeneralNoteViewState extends State<GeneralNoteView> {
   }
 }
 
-class LessonNoteView extends StatefulWidget {
+class ScheduleNoteView extends StatelessWidget {
   final LessonID id;
-  const LessonNoteView({super.key, required this.id});
+  const ScheduleNoteView({super.key, required this.id});
 
   @override
-  State<LessonNoteView> createState() => _LessonNoteViewState();
-}
-
-class _LessonNoteViewState extends State<LessonNoteView> {
-  @override
-  Widget build(BuildContext context) => Selector<LessonNotes, String?>(
-    selector: (_, provider) => provider.getNote(widget.id)?.content,
-    builder: (context, noteName, child) => Padding(
-      padding: EdgeInsets.only(top: 8),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: 650),
-        child: SizedBox(
-          width: double.infinity,
-          height: 40,
-          child: Material(
-            borderRadius: BorderRadius.all(Radius.circular(8)),
-            color: ColorScheme.of(context).surfaceVariant,
-            child: Padding(
-              padding: EdgeInsetsGeometry.all(6),
-              child: Text(
-                noteName ?? "",
-                style: TextStyle(color: Colors.white, fontSize: 20),
-                overflow: TextOverflow.ellipsis,
+  Widget build(BuildContext context) {
+    return Selector<LessonNotes, String?>(
+      selector: (_, provider) => provider.getNote(id)?.content,
+      builder: (context, note, child) => Padding(
+        padding: EdgeInsets.only(top: 8),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 650),
+          child: SizedBox(
+            width: double.infinity,
+            height: 30,
+            child: Material(
+              borderRadius: BorderRadius.all(Radius.circular(8)),
+              color: ColorScheme.of(context).surfaceVariant,
+              child: Padding(
+                padding: EdgeInsets.only(left: 6, bottom: 6, right: 2),
+                child: Text(
+                  note ?? "",
+                  style: TextStyle(
+                    color: textColorForContainer(
+                      context,
+                      ColorScheme.of(context).surfaceVariant,
+                    ),
+                    fontSize: 15,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.left,
+                ),
               ),
             ),
           ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _FullScreenView extends StatefulWidget {
   final Function action;
   final LessonID id;
-  const _FullScreenView({super.key, required this.action, required this.id});
+  const _FullScreenView({required this.action, required this.id});
 
   @override
   State<_FullScreenView> createState() => _FullScreenViewState();
@@ -114,9 +120,9 @@ class _FullScreenView extends StatefulWidget {
 class _FullScreenViewState extends State<_FullScreenView> {
   @override
   Widget build(BuildContext context) {
-    final model = Provider.of<LessonNotes>(context, listen: false);
-    String content = model.getNote(widget.id)?.content ?? "";
-    String title = model.getNote(widget.id)?.title ?? "";
+    final notes = Provider.of<LessonNotes>(context, listen: false);
+    String content = notes.getNote(widget.id)?.content ?? "";
+    String title = notes.getNote(widget.id)?.title ?? "";
     return Scaffold(
       appBar: AppBar(),
       body: Center(
@@ -133,13 +139,24 @@ class _FullScreenViewState extends State<_FullScreenView> {
                       child: Column(
                         children: [
                           TextFormField(
-                            style: TextStyle(fontSize: 30, color: Colors.white),
+                            style: TextStyle(
+                              fontSize: 30,
+                              color: textColorForContainer(
+                                context,
+                                ColorScheme.of(context).surfaceVariant,
+                              ),
+                            ),
                             initialValue: title,
                             onChanged: (value) => title = value,
                           ),
                           Expanded(
                             child: TextFormField(
-                              style: TextStyle(color: Colors.white),
+                              style: TextStyle(
+                                color: textColorForContainer(
+                                  context,
+                                  ColorScheme.of(context).surfaceVariant,
+                                ),
+                              ),
                               initialValue: content,
                               onChanged: (value) => content = value,
                               expands: true,
@@ -158,8 +175,8 @@ class _FullScreenViewState extends State<_FullScreenView> {
                       margin: EdgeInsets.all(30),
                       child: ElevatedButton(
                         onPressed: () {
-                          model.setContent(widget.id, content);
-                          model.setTitle(widget.id, title);
+                          notes.setContent(widget.id, content, context);
+                          notes.setTitle(widget.id, title, context);
                           widget.action();
                         },
                         child: Text("Сохранить"),
@@ -170,7 +187,7 @@ class _FullScreenViewState extends State<_FullScreenView> {
                       margin: EdgeInsets.all(30),
                       child: ElevatedButton(
                         onPressed: () {
-                          model.delNote(widget.id);
+                          notes.delNote(widget.id, context);
                           widget.action();
                         },
                         child: Text("Удалить"),

@@ -21,14 +21,26 @@ import 'package:timetable/models/filter.dart';
 import 'package:timetable/models/lesson.dart';
 import 'package:timetable/other/debug_window.dart';
 import 'package:timetable/processors/group_processor.dart';
+import 'package:timetable/save_system/save_system.dart';
 import 'package:timetable/widgets/lesson_widget.dart';
 import 'package:timetable/screens/notes_screen.dart';
 import 'package:timetable/screens/schedule_screen.dart';
 import 'package:timetable/utils/filter.dart';
 import 'package:timetable/utils/lessons.dart';
-import 'models/note.dart';
+import 'package:timetable/models/note.dart';
 
-void main() {
+void main() async {
+  final save = SaveSystem();
+  await save.init();
+
+  final groupProcessor = GroupProcessor();
+
+  final json = save.loadLessons();
+  if (json != null) {
+    groupProcessor.updateFromRaw(json);
+    groupProcessor.setSubgroup(2);
+  }
+
   //Provider.debugCheckInvalidValueType = null;
   WidgetsFlutterBinding.ensureInitialized();
   // debugPaintSizeEnabled = true;
@@ -40,12 +52,12 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => SessionManager()),
         ChangeNotifierProxyProvider<SessionManager, GroupProcessor>(
-          create: (_) => GroupProcessor(),
-          update: (context, session, group) => group!..updateSession(session)
-          ,
+          create: (_) => groupProcessor,
+          update: (context, session, group) => group!..updateSession(session),
         ),
         // ListenableProvider<GroupProcessor>.value(value: GroupProcessor()),
-        ListenableProvider<LessonNotes>.value(value: LessonNotes()),
+        ListenableProvider<LessonNotes>.value(value: save.loadNotes()),
+        Provider<SaveSystem>.value(value: save),
         // ListenableProvider<SessionManager>.value(value: SessionManager()),
       ],
       child: DynamicColorBuilder(
@@ -83,7 +95,9 @@ class Main extends StatefulWidget {
   const Main({super.key});
 
   @override
-  State<Main> createState() => _MainState();
+  State<Main> createState() {
+    return _MainState();
+  }
 }
 
 class _MainState extends State<Main> {
@@ -137,7 +151,13 @@ class _MainState extends State<Main> {
                             // for (final l in less) {
                             //   debugPrint(l.toString());
                             // }
+
+                            final notes = context.read<LessonNotes>();
+                            final save = context.read<SaveSystem>();
                             final processor = context.read<GroupProcessor>();
+
+                            notes.clear(context);
+                            save.saveLessons(controller.text);
                             processor.updateFromRaw(controller.text);
                             processor.setSubgroup(2);
                           },
@@ -167,7 +187,7 @@ class _MainState extends State<Main> {
                     ),
                     NavigationDestination(
                       icon: Icon(Icons.notes),
-                      label: "Заметки???",
+                      label: "Заметки",
                     ),
                   ],
                   selectedIndex: _selectedScreen,

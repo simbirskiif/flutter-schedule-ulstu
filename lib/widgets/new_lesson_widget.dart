@@ -73,61 +73,35 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
                   child: Column(
                     spacing: 2,
                     children: [
-                      Stack(
-                        children: [
-                          Align(
-                            alignment: AlignmentGeometry.topLeft,
-                            child: SizedBox(
-                              child: RichText(
-                                maxLines: 2,
-                                text: TextSpan(
-                                  children: [
-                                    WidgetSpan(
-                                      child: Padding(
-                                        padding: EdgeInsetsGeometry.only(
-                                          right: 2,
-                                        ),
-                                        child: NewLessonTypeWidget(
-                                          lessonType: widget.lesson.lessonType,
-                                          subgroup: widget.lesson.subgroup,
-                                        ),
-                                      ),
+                      Align(
+                        alignment: AlignmentGeometry.topLeft,
+                        child: SizedBox(
+                          child: RichText(
+                            maxLines: 2,
+                            text: TextSpan(
+                              children: [
+                                WidgetSpan(
+                                  child: Padding(
+                                    padding: EdgeInsetsGeometry.only(right: 2),
+                                    child: NewLessonTypeWidget(
+                                      lessonType: widget.lesson.lessonType,
+                                      subgroup: widget.lesson.subgroup,
                                     ),
-                                    TextSpan(
-                                      style: TextStyle(
-                                        color: textColorForContainer(
-                                          context,
-                                          ColorScheme.of(
-                                            context,
-                                          ).surfaceVariant,
-                                        ),
-                                      ),
-                                      text: widget.lesson.nameOfLesson,
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                              ),
+                                TextSpan(
+                                  style: TextStyle(
+                                    color: textColorForContainer(
+                                      context,
+                                      ColorScheme.of(context).surfaceVariant,
+                                    ),
+                                  ),
+                                  text: widget.lesson.nameOfLesson,
+                                ),
+                              ],
                             ),
                           ),
-                          Selector<LessonNotes, Note?>(
-                            selector: (_, provider) =>
-                                provider.getNote(widget.lesson.id),
-                            builder: (context, note, child) => note == null
-                                ? Align(
-                                    alignment: AlignmentGeometry.topRight,
-                                    child: TextButton(
-                                      child: Text(
-                                        '+',
-                                        style: TextStyle(fontSize: 22),
-                                      ),
-                                      onPressed: () {
-                                        notes.add(widget.lesson.id);
-                                      },
-                                    ),
-                                  )
-                                : SizedBox(),
-                          ),
-                        ],
+                        ),
                       ),
                       Spacer(),
                       Row(
@@ -157,6 +131,29 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
+                                  Opacity(
+                                    opacity: note == null ? 1.0 : 0.0,
+                                    child: ElevatedButton(
+                                      onPressed: note == null
+                                          ? () {
+                                              notes.add(
+                                                widget.lesson.id,
+                                                context,
+                                              );
+                                            }
+                                          : null,
+                                      style: ElevatedButton.styleFrom(
+                                        elevation: 0.0,
+                                        backgroundColor: ColorScheme.of(
+                                          context,
+                                        ).surfaceVariant,
+                                      ),
+                                      child: Text(
+                                        '+',
+                                        style: TextStyle(fontSize: 22),
+                                      ),
+                                    ),
+                                  ),
                                   Text(
                                     widget.lesson.room,
                                     style: TextStyle(
@@ -208,7 +205,7 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
           ),
           note != null
               ? NoteWidget(
-                  closedBuilder: LessonNoteView(id: widget.lesson.id),
+                  closedBuilder: ScheduleNoteView(id: widget.lesson.id),
                   id: widget.lesson.id,
                 )
               : SizedBox(),

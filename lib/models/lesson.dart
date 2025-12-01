@@ -1,5 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-
 import 'package:timetable/widgets/lesson_type_widget.dart';
 
 class LessonID {
@@ -16,6 +14,22 @@ class LessonID {
 
   @override
   int get hashCode => Object.hash(week, day, index, name);
+
+  Map<String, dynamic> toJson() => {
+    'week': week.toString(),
+    'day': day.toString(),
+    'index': index.toString(),
+    'name': name,
+  };
+
+  factory LessonID.fromJson(Map<String, dynamic> json) {
+    return LessonID(
+      int.parse(json['week']),
+      int.parse(json['day']),
+      int.parse(json['index']),
+      json['name'],
+    );
+  }
 }
 
 class Lesson {
