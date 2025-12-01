@@ -77,7 +77,7 @@ class SessionManager with ChangeNotifier {
 
   Future<OnlineStatus> fetchUserData() async {
     fetchingData = true;
-    notifyListeners();
+    // notifyListeners();
     var iters = 5;
     var status = await _fetchUserData();
     if (status == OnlineStatus.ok) {

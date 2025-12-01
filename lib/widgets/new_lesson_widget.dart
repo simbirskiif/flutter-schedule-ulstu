@@ -52,128 +52,133 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
   @override
   Widget build(BuildContext context) {
     final notes = Provider.of<LessonNotes>(context, listen: false);
-    return Selector<LessonNotes, Note?>(
-      selector: (_, provider) => provider.getNote(widget.lesson.id),
-      builder: (context, note, child) => Column(
-        mainAxisSize: MainAxisSize.min, 
-        children: [
-          Material(
-            borderRadius: BorderRadius.circular(16),
-            color: ColorScheme.of(context).surfaceVariant,
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize:
-                    MainAxisSize.min, 
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  RichText(
-                    maxLines: 2,
-                    text: TextSpan(
-                      children: [
-                        WidgetSpan(
-                          alignment: PlaceholderAlignment.middle,
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 2),
-                            child: NewLessonTypeWidget(
-                              lessonType: widget.lesson.lessonType,
-                              subgroup: widget.lesson.subgroup,
-                            ),
-                          ),
-                        ),
-                        TextSpan(
-                          text: widget.lesson.nameOfLesson,
-                          style: TextStyle(
-                            color: textColorForContainer(
-                              context,
-                              ColorScheme.of(context).surfaceVariant,
-                            ),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: 650),
+        child: Selector<LessonNotes, Note?>(
+          selector: (_, provider) => provider.getNote(widget.lesson.id),
+          builder: (context, note, child) => Column(
+            mainAxisSize: MainAxisSize.min, 
+            children: [
+              Material(
+                borderRadius: BorderRadius.circular(16),
+                color: ColorScheme.of(context).surfaceVariant,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize:
+                        MainAxisSize.min, 
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.person, size: 16),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          widget.lesson.teacher,
-                          style: TextStyle(
-                            color: textColorForContainer(
-                              context,
-                              ColorScheme.of(context).surfaceVariant,
+                      RichText(
+                        maxLines: 2,
+                        text: TextSpan(
+                          children: [
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.middle,
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 2),
+                                child: NewLessonTypeWidget(
+                                  lessonType: widget.lesson.lessonType,
+                                  subgroup: widget.lesson.subgroup,
+                                ),
+                              ),
+                            ),
+                            TextSpan(
+                              text: widget.lesson.nameOfLesson,
+                              style: TextStyle(
+                                color: textColorForContainer(
+                                  context,
+                                  ColorScheme.of(context).surfaceVariant,
+                                ),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Icon(Icons.person, size: 16),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              widget.lesson.teacher,
+                              style: TextStyle(
+                                color: textColorForContainer(
+                                  context,
+                                  ColorScheme.of(context).surfaceVariant,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                      Text(
-                        widget.lesson.room,
-                        style: TextStyle(
-                          color: textColorForContainer(
-                            context,
-                            ColorScheme.of(context).surfaceVariant,
+                          Text(
+                            widget.lesson.room,
+                            style: TextStyle(
+                              color: textColorForContainer(
+                                context,
+                                ColorScheme.of(context).surfaceVariant,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 2),
-                      const Icon(Icons.door_back_door_outlined, size: 16),
-                    ],
-                  ),
-                  if (relativeTime.status != LessonTimeStatus.complete)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        textDifference,
-                        style: TextStyle(
-                          color: textColorForContainer(
-                            context,
-                            ColorScheme.of(context).surfaceVariant,
-                          ),
-                        ),
-                      ),
-                    ),
-                  if (relativeTime.status == LessonTimeStatus.inProgress)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: SizedBox(
-                        height: 6,
-                        child: LinearProgressIndicatorM3E(
-                          value: valueProgressBar,
-                          size: LinearProgressM3ESize.s,
-                          shape: ProgressM3EShape.wavy,
-                        ),
-                      ),
-                    ),
-                  if (note == null)
-                    GestureDetector(
-                      onTap: () => notes.add(widget.lesson.id, context),
-                      child: Column(
-                        children: [
-                          const Divider(height: 8),
-                          Row(
-                            children: const [
-                              Icon(Icons.add),
-                              SizedBox(width: 4),
-                              Text("Добавьте задачу для этого занятия"),
-                            ],
-                          ),
+                          const SizedBox(width: 2),
+                          const Icon(Icons.door_back_door_outlined, size: 16),
                         ],
                       ),
-                    ),
-                ],
+                      if (relativeTime.status != LessonTimeStatus.complete)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Text(
+                            textDifference,
+                            style: TextStyle(
+                              color: textColorForContainer(
+                                context,
+                                ColorScheme.of(context).surfaceVariant,
+                              ),
+                            ),
+                          ),
+                        ),
+                      if (relativeTime.status == LessonTimeStatus.inProgress)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: SizedBox(
+                            height: 6,
+                            child: LinearProgressIndicatorM3E(
+                              value: valueProgressBar,
+                              size: LinearProgressM3ESize.s,
+                              shape: ProgressM3EShape.wavy,
+                            ),
+                          ),
+                        ),
+                      if (note == null)
+                        GestureDetector(
+                          onTap: () => notes.add(widget.lesson.id, context),
+                          child: Column(
+                            children: [
+                              const Divider(height: 8),
+                              Row(
+                                children: const [
+                                  Icon(Icons.add),
+                                  SizedBox(width: 4),
+                                  Text("Добавьте задачу для этого занятия"),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
               ),
-            ),
+              if (note != null)
+                NoteWidget(
+                  closedBuilder: ScheduleNoteView(id: widget.lesson.id),
+                  id: widget.lesson.id,
+                ),
+            ],
           ),
-          if (note != null)
-            NoteWidget(
-              closedBuilder: ScheduleNoteView(id: widget.lesson.id),
-              id: widget.lesson.id,
-            ),
-        ],
+        ),
       ),
     );
   }
