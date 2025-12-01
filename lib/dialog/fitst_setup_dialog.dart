@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:timetable/api/session_manager.dart';
 import 'package:timetable/dialog/manual_group_select.dart';
 import 'package:timetable/processors/group_processor.dart';
+import 'package:timetable/save_system/save_system.dart';
 import 'package:timetable/widgets/segmented_buttons.dart';
 
 void showFirstSetupDialog(BuildContext context) {
@@ -65,7 +66,16 @@ class _FirstSetupDialogState extends State<FirstSetupDialog> {
       context,
       listen: false,
     );
+    final save = Provider.of<SaveSystem>(context, listen: false);
+
+    // сохраняем выбор группы и подгруппы
     manager.group = group;
+    save.saveGroupName(group);
+    // сохраняем подгруппу в SaveSystem (и GroupProcessor тоже сохранит)
+    if (subgroup != -1) {
+      save.saveGroup(subgroup);
+    }
+
     await processor.updateFromGroup();
     processor.setSubgroup(subgroup);
   }

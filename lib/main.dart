@@ -1,4 +1,4 @@
-// ignore_for_file: unused_import, prefer_typing_uninitialized_variables, unnecessary_import, deprecated_member_use
+// ignore_for_file: unused_import, prefer_typing_uninitialized_variables, unnecessary_import, deprecated_member_use, use_build_context_synchronously
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:math';
@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:loading_indicator_m3e/loading_indicator_m3e.dart';
 import 'package:progress_indicator_m3e/progress_indicator_m3e.dart';
 import 'package:provider/provider.dart';
 import 'package:system_theme/system_theme.dart';
@@ -94,7 +95,7 @@ void main() async {
 }
 
 class SplashScreen extends StatefulWidget {
-  SplashScreen({super.key});
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -114,6 +115,46 @@ class _SplashScreenState extends State<SplashScreen> {
     final session = context.read<SessionManager>();
     final processor = context.read<GroupProcessor>();
 
+    // Попытаемся загрузить локальные уроки сразу
+    final savedLessons = save.loadLessons();
+    if (savedLessons != null && savedLessons.isNotEmpty) {
+      // Загрузить локальную копию расписания и подгруппу
+      processor.updateFromRaw(savedLessons);
+      final savedSub = save.loadSubGroup() ?? 1;
+      processor.setSubgroup(savedSub);
+      // Восстановить сохранённую группу в сессии (если есть)
+      final savedGroup = save.loadGroupName();
+      if (savedGroup != null) {
+        session.group = savedGroup;
+      }
+
+      // Открываем приложение — не дожидаясь логина (логин будет происходить фоном)
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => Main()),
+      );
+
+      // Фоновая попытка логина/обновления данных
+      final login = await save.getLogin();
+      final password = await save.getPassword();
+      if (login != null && password != null) {
+        final status = await session.login(login, password);
+        if (status == OnlineStatus.ok) {
+          await session.fetchUserData();
+          // Обновим расписание с сервера при успешном логине
+          final ok = await processor.updateFromGroup();
+          // восстановим сохранённую подгруппу после обновления
+          final sub = save.loadSubGroup() ?? savedSub;
+          processor.setSubgroup(sub);
+        } else {
+          session.offline = true;
+        }
+      }
+      return;
+    }
+
+    // Если локальных уроков нет — старое поведение: пробуем из secure storage получить логин/пароль и логинимся
     final login = await save.getLogin();
     final password = await save.getPassword();
 
@@ -156,7 +197,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    return const Scaffold(body: Center(child: LoadingIndicatorM3E()));
   }
 }
 
@@ -229,7 +270,7 @@ class _MainState extends State<Main> {
                             notes.update(context);
                             save.saveLessons(controller.text);
                             processor.updateFromRaw(controller.text);
-                            processor.setSubgroup(2);
+                            processor.setSubgroup(2, context);
                           },
                           child: Text("Принять"),
                         ),

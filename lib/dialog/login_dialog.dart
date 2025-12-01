@@ -150,7 +150,10 @@ void showLoginDialogSecure(BuildContext context) {
                         isLock = false;
                         passwordController.clear();
                         if (status == OnlineStatus.ok) {
-                          saveSystem.saveLoginPassword(login, password);
+                          await saveSystem.saveLoginPassword(
+                            login,
+                            password,
+                          ); // <- обязательно await
                           if (context.mounted) {
                             Navigator.pop(context);
                             showFirstSetupDialog(context);

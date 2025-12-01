@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:provider/provider.dart';
 import 'package:timetable/api/fetch_final_response.dart';
 import 'package:timetable/api/session_manager.dart';
 import 'package:timetable/enum/online_status.dart';
@@ -47,6 +48,7 @@ class GroupProcessor with ChangeNotifier {
   GroupProcessor() {
     _lessons = [];
   }
+
   Future<Tuple2<OnlineStatus, List<Lesson>?>> getLessonsByGroup(
     String group,
   ) async {
@@ -130,8 +132,14 @@ class GroupProcessor with ChangeNotifier {
     notifyListeners();
   }
 
-  void setSubgroup(int t) {
+  // Изменил сигнатуру: контекст теперь необязателен; метод сам сохранит подгруппу через _saveSystem
+  void setSubgroup(int t, [BuildContext? context]) {
     _currentSubgroup = t.abs() > _subgroupsCount ? 0 : t;
+    try {
+      _saveSystem.saveGroup(_currentSubgroup);
+    } catch (_) {
+      // если _saveSystem не инициализирован — молча пропускаем
+    }
     notifyListeners();
   }
 
