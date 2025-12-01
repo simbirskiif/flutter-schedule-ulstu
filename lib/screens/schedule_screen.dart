@@ -2,12 +2,19 @@
 
 import 'dart:math';
 import 'dart:ui';
+import 'package:button_m3e/button_m3e.dart';
 import 'package:expressive_refresh/expressive_refresh.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:loading_indicator_m3e/loading_indicator_m3e.dart';
+import 'package:progress_indicator_m3e/progress_indicator_m3e.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:timetable/api/session_manager.dart';
+import 'package:timetable/dialog/fitst_setup_dialog.dart';
+import 'package:timetable/dialog/login_dialog.dart';
+import 'package:timetable/main.dart';
 import 'package:timetable/processors/group_processor.dart';
 import 'package:timetable/widgets/new_lesson_widget.dart';
 
@@ -21,14 +28,10 @@ class ScheduleScreen extends StatefulWidget {
 class _ScheduleScreenState extends State<ScheduleScreen> {
   // GlobalKey<ExpressiveRefreshIndicatorState> _key = GlobalKey();
   final GlobalKey<ExpressiveRefreshIndicatorState> refreshKey = GlobalKey();
-  //TODO: fix initital page
-  PageController _pageController = PageController(
-    initialPage: 0,
-    viewportFraction: 1,
-    keepPage: false,
-  );
+  PageController _pageController = PageController();
   // late final List<DateTime> _days;
   int _currentPage = 0;
+  bool _isPageControllerInitialized = false;
   // DateTime a = DateTime(2024);
 
   // DateTime _focusedDay = DateTime.now();
@@ -39,21 +42,45 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   // ValueNotifier<DateTime> focusedDayNotifier = ValueNotifier(DateTime.now());
 
   Future<void> _onRefresh() async {
-    await Future.delayed(Duration(seconds: Random().nextInt(10)));
+    await context.read<GroupProcessor>().updateFromGroup();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
-    final processor = context.read<GroupProcessor>();
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   final processor = context.read<GroupProcessor>();
+    //   final days = processor.days;
+    //   int initialPage = days.indexWhere(
+    //     (day) =>
+    //         day.year == DateTime.now().year &&
+    //         day.month == DateTime.now().month &&
+    //         day.day == DateTime.now().day,
+    //   );
 
-    int initialPage = processor.getInitialDayIndex(today: DateTime.now());
+    //   _pageController = PageController(
+    //     initialPage: initialPage != -1 ? initialPage : 0,
+    //   );
 
-    if (initialPage != -1) {
-      _pageController = PageController(initialPage: initialPage);
-    } else {
-      _pageController = PageController(initialPage: 0);
-    }
+    //   setState(() {});
+    // });
+    // final processor = context.read<GroupProcessor>();
+
+    // int initialPage = processor.getInitialDayIndex(today: DateTime.now());
+
+    // if (initialPage != -1) {
+    //   setState(() {
+    //     _pageController = PageController(initialPage: initialPage);
+    //   });
+    // } else {
+    //   _pageController = PageController(initialPage: 0);
+    // }
 
     // _days = List.generate(29, (i) {
     //   return DateTime.now().subtract(Duration(days: 14)).add(Duration(days: i));
@@ -74,10 +101,56 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     final processor = context.watch<GroupProcessor>();
     final selectedDay = processor.selectedDay ?? today;
     final days = processor.days;
-    if (days.isEmpty) {
+    if (!context.read<SessionManager>().loggedIn) {
+      return Center(
+        child: Column(
+          spacing: 4,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.warning, size: 48),
+            Text("Войдите в аккунт"),
+            ButtonM3E(
+              onPressed: () {
+                showLoginDialogSecure(context);
+              },
+              label: Text("Войти"),
+              style: ButtonM3EStyle.outlined,
+              icon: Icon(Icons.login),
+            ),
+          ],
+        ),
+      );
+    }
+    if (context.read<SessionManager>().isLoggining &&
+        context.read<GroupProcessor>().lessons.isEmpty) {
+      return Center(child: LoadingIndicatorM3E());
+    }
+    if (context.read<GroupProcessor>().isLoading &&
+        context.read<GroupProcessor>().lessons.isEmpty) {
+      return Center(child: LoadingIndicatorM3E());
+    }
+    if (days.isEmpty &&
+        !context.read<SessionManager>().isLoggining &&
+        context.read<GroupProcessor>().lessons.isEmpty) {
       return const Center(child: Text("Нет данных"));
     }
-
+    if (!_isPageControllerInitialized) {
+      int initialPage = days.indexWhere(
+        (day) =>
+            day.year == today.year &&
+            day.month == today.month &&
+            day.day == today.day,
+      );
+      initialPage = initialPage != -1 ? initialPage : 0;
+      _pageController = PageController(initialPage: initialPage);
+      _currentPage = initialPage;
+      _isPageControllerInitialized = true;
+      if (initialPage != -1) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          processor.setSelectedDay(days[initialPage]);
+        });
+      }
+    }
     return Column(
       children: [
         Padding(

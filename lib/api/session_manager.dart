@@ -12,6 +12,7 @@ class SessionManager with ChangeNotifier {
   String? name;
   bool loggedIn = false;
   bool fetchingData = false;
+  bool isLoggining = false;
   SessionManager();
 
   Future<void> logout() async {
@@ -49,8 +50,12 @@ class SessionManager with ChangeNotifier {
   }
 
   Future<OnlineStatus> login(String login, String password) async {
+    isLoggining = true;
+    notifyListeners();
     int iters = 5;
     if (ams != null) {
+      isLoggining = false;
+      notifyListeners();
       return OnlineStatus.undefined;
     }
     LoginState state = await LoginManager.login(login, password);
@@ -65,6 +70,7 @@ class SessionManager with ChangeNotifier {
       this.password = password;
       ams = state.ams;
     }
+    isLoggining = false;
     notifyListeners();
     return state.loginStates;
   }

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:button_m3e/button_m3e.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_indicator_m3e/loading_indicator_m3e.dart';
@@ -35,6 +37,7 @@ class _FirstSetupDialogState extends State<FirstSetupDialog> {
   bool isLoadingGroups = true;
   int subgroupsCount = 0;
   String? group;
+  int subgroup = -1;
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
@@ -53,6 +56,20 @@ class _FirstSetupDialogState extends State<FirstSetupDialog> {
     }
   }
 
+  Future<void> saveAndLoad() async {
+    GroupProcessor processor = Provider.of<GroupProcessor>(
+      context,
+      listen: false,
+    );
+    SessionManager manager = Provider.of<SessionManager>(
+      context,
+      listen: false,
+    );
+    manager.group = group;
+    await processor.updateFromGroup();
+    processor.setSubgroup(subgroup);
+  }
+
   Future<void> loadSubgroups() async {
     if (mounted) {
       setState(() {
@@ -61,10 +78,6 @@ class _FirstSetupDialogState extends State<FirstSetupDialog> {
       });
     }
     GroupProcessor processor = Provider.of<GroupProcessor>(
-      context,
-      listen: false,
-    );
-    SessionManager manager = Provider.of<SessionManager>(
       context,
       listen: false,
     );
@@ -99,7 +112,6 @@ class _FirstSetupDialogState extends State<FirstSetupDialog> {
   @override
   Widget build(BuildContext context) {
     SessionManager manager = Provider.of<SessionManager>(context);
-    GroupProcessor processor = Provider.of<GroupProcessor>(context);
     return AlertDialog(
       title: Text(
         manager.name != null
@@ -262,40 +274,47 @@ class _FirstSetupDialogState extends State<FirstSetupDialog> {
                                     ),
                                   )
                                 : subgroupsCount > 0
-                                ? Column(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 2,
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              "Выбрать подгруппу:",
-                                              textAlign: TextAlign.left,
-                                              style: TextStyle(
-                                                color: ColorScheme.of(
-                                                  context,
-                                                ).onSurface,
-                                              ),
+                                ? Builder(
+                                    builder: (context) {
+                                      subgroup = 1;
+                                      return Column(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 2,
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                      SegmentedButtons(
-                                        items: [
-                                          for (
-                                            var n = 1;
-                                            n <= subgroupsCount;
-                                            n++
-                                          )
-                                            n.toString(),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  "Выбрать подгруппу:",
+                                                  textAlign: TextAlign.left,
+                                                  style: TextStyle(
+                                                    color: ColorScheme.of(
+                                                      context,
+                                                    ).onSurface,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          SegmentedButtons(
+                                            initialIndex: subgroup - 1,
+                                            items: [
+                                              for (
+                                                var n = 1;
+                                                n <= subgroupsCount;
+                                                n++
+                                              )
+                                                n.toString(),
+                                            ],
+                                            onSelected: (value) {
+                                              debugPrint(value.toString());
+                                              subgroup = value + 1;
+                                            },
+                                          ),
                                         ],
-                                        onSelected: (value) {
-                                          debugPrint(value.toString());
-                                        },
-                                      ),
-                                    ],
+                                      );
+                                    },
                                   )
                                 : Center(
                                     child: Row(
@@ -331,7 +350,15 @@ class _FirstSetupDialogState extends State<FirstSetupDialog> {
           child: Text("Закрыть"),
         ),
         !manager.fetchingData && manager.loggedIn
-            ? TextButton(onPressed: () {}, child: Text("Сохранить"))
+            ? TextButton(
+                onPressed: () {
+                  if (subgroup != -1 && mounted) {
+                    saveAndLoad();
+                    Navigator.pop(context);
+                  }
+                },
+                child: Text("Сохранить"),
+              )
             : Text(""),
         !manager.loggedIn
             ? TextButton(

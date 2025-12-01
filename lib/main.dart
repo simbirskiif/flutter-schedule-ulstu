@@ -17,6 +17,9 @@ import 'package:provider/provider.dart';
 import 'package:system_theme/system_theme.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:timetable/api/session_manager.dart';
+import 'package:timetable/dialog/fitst_setup_dialog.dart';
+import 'package:timetable/dialog/login_dialog.dart';
+import 'package:timetable/dialog/setup_dialog.dart';
 import 'package:timetable/models/filter.dart';
 import 'package:timetable/models/lesson.dart';
 import 'package:timetable/other/debug_window.dart';
@@ -30,11 +33,10 @@ import 'package:timetable/utils/lessons.dart';
 import 'package:timetable/models/note.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   final save = SaveSystem();
   await save.init();
-
   final groupProcessor = GroupProcessor();
-
   final json = save.loadLessons();
   if (json != null) {
     groupProcessor.updateFromRaw(json);
@@ -42,7 +44,6 @@ void main() async {
   }
 
   //Provider.debugCheckInvalidValueType = null;
-  WidgetsFlutterBinding.ensureInitialized();
   // debugPaintSizeEnabled = true;
   // PlatformDispatcher.instance.onReportTimings = (timings) {
   //   debugPrint('Frame timings: ${timings.length}');
@@ -169,11 +170,11 @@ class _MainState extends State<Main> {
                 },
                 child: Icon(Icons.code),
               ),
-              MaterialButton(
+              IconButton(
                 onPressed: () {
                   showBottomSheet(innerContext);
                 },
-                child: Text("Change group"),
+                icon: Icon(Icons.settings),
               ),
             ],
           ),
@@ -271,10 +272,21 @@ class _MainState extends State<Main> {
                           children: [
                             Align(
                               alignment: Alignment.centerRight,
-                              child: OutlinedButton(
-                                onPressed: () {},
-                                child: Text("data"),
-                              ),
+                              child: !manager.loggedIn
+                                  ? OutlinedButton(
+                                      onPressed: () {
+                                        showLoginDialogSecure(context);
+                                      },
+                                      child: Text("Войти"),
+                                    )
+                                  : manager.isLoggining
+                                  ? CircularProgressIndicatorM3E()
+                                  : FilledButton(
+                                      onPressed: () {
+                                        showSetupDialog(context);
+                                      },
+                                      child: Text("Управлять"),
+                                    ),
                             ),
                             Align(
                               alignment: Alignment.centerLeft,

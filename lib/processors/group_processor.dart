@@ -20,7 +20,7 @@ class GroupProcessor with ChangeNotifier {
   DateTime? _scheduleStartDate;
   DateTime? _scheduleEndDate;
   DateTime? _selectedDay;
-
+  bool isLoading = false;
   int _currentSubgroup = 0;
 
   void updateSession(SessionManager session) {
@@ -117,11 +117,62 @@ class GroupProcessor with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<bool> updateFromGroup() async {
+    isLoading = true;
+    if (!_session.loggedIn) {
+      isLoading = false;
+      notifyListeners();
+      return false;
+    }
+    if (_session.group == null) {
+      isLoading = false;
+      notifyListeners();
+      return false;
+    }
+    final temp = await getLessonsByGroup(_session.group!);
+    if (temp.item1 != OnlineStatus.ok) {
+      isLoading = false;
+      notifyListeners();
+      return false;
+    }
+    if (temp.item2 == null) {
+      isLoading = false;
+      notifyListeners();
+      return false;
+    }
+    try {
+      final newLessons = temp.item2!;
+      if (newLessons.isEmpty) {
+        isLoading = false;
+        notifyListeners();
+        return false;
+      }
+      newLessons.sort((a, b) => a.dateTime.compareTo(b.dateTime));
+      final newStart = newLessons.first.dateTime;
+      final newEnd = newLessons.last.dateTime;
+      final newGroupName = newLessons.first.group;
+      final newSubgroupCount = newLessons.map((e) => e.subgroup).reduce(max);
+      _lessons = newLessons;
+      _groupName = newGroupName;
+      _scheduleStartDate = newStart;
+      _scheduleEndDate = newEnd;
+      _subgroupsCount = newSubgroupCount;
+      isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (_) {
+      isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
   bool updateFromRaw(String rawJson) {
     try {
       final dumps = decodeJSON(rawJson);
       final newLessons = converDumpToLessons(dumps);
       if (newLessons.isEmpty) {
+        notifyListeners();
         return false;
       }
       newLessons.sort((a, b) => a.dateTime.compareTo(b.dateTime));
@@ -140,6 +191,7 @@ class GroupProcessor with ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
+      notifyListeners();
       return false;
     }
   }
