@@ -17,38 +17,54 @@ void showSetupDialog(BuildContext context) {
           spacing: 4,
           mainAxisSize: MainAxisSize.min,
           children: [
-            ButtonM3E(
-              onPressed: () {
-                Navigator.pop(context);
-                showFirstSetupDialog(context);
-              },
-              label: Text(
-                "Перейти к выбору группы и подгруппы",
-                softWrap: true,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              icon: Icon(Icons.edit),
-              style: ButtonM3EStyle.filled,
+            Row(
+              children: [
+                Expanded(
+                  child: ButtonM3E(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      showFirstSetupDialog(context);
+                    },
+                    label: Row(
+                      children: [
+                        Text(
+                          "Перейти к выбору группы и подгруппы",
+                          softWrap: true,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                    icon: Icon(Icons.edit),
+                    style: ButtonM3EStyle.filled,
+                  ),
+                ),
+              ],
             ),
-            ButtonM3E(
-              onPressed: () {
-                final manager = Provider.of<SessionManager>(
-                  context,
-                  listen: false,
-                );
-                final processor = Provider.of<GroupProcessor>(
-                  context,
-                  listen: false,
-                );
-                final notes = Provider.of<LessonNotes>(context, listen: false);
-                final save = Provider.of<SaveSystem>(context, listen: false);
-                manager.logoutAndDropData(processor, notes, save);
-                Navigator.pop(context);
-              },
-              label: Text("Выйти и удалить данные"),
-              icon: Icon(Icons.logout),
-              style: ButtonM3EStyle.outlined,
+            Row(
+              children: [
+                Expanded(
+                  child: ButtonM3E(
+                    onPressed: () {
+                      final manager = Provider.of<SessionManager>(
+                        context,
+                        listen: false,
+                      );
+                      final processor = Provider.of<GroupProcessor>(
+                        context,
+                        listen: false,
+                      );
+                      final notes = Provider.of<LessonNotes>(context, listen: false);
+                      final save = Provider.of<SaveSystem>(context, listen: false);
+                      manager.logoutAndDropData(processor, notes, save);
+                      Navigator.pop(context);
+                    },
+                    label: Text("Выйти и удалить данные"),
+                    icon: Icon(Icons.logout),
+                    style: ButtonM3EStyle.outlined,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

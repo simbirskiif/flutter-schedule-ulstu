@@ -143,7 +143,7 @@ class _SplashScreenState extends State<SplashScreen> {
         if (status == OnlineStatus.ok) {
           await session.fetchUserData();
           // Обновим расписание с сервера при успешном логине
-          final ok = await processor.updateFromGroup();
+          await processor.updateFromGroup();
           // восстановим сохранённую подгруппу после обновления
           final sub = save.loadSubGroup() ?? savedSub;
           processor.setSubgroup(sub);
@@ -159,8 +159,7 @@ class _SplashScreenState extends State<SplashScreen> {
     final password = await save.getPassword();
 
     if (login != null && password != null) {
-      LessonNotes lessonNotes = context.read<LessonNotes>();
-      lessonNotes = save.loadNotes();
+      context.read<LessonNotes>();
       final status = await session.login(login, password);
 
       if (!mounted) return;
@@ -262,11 +261,9 @@ class _MainState extends State<Main> {
                             // for (final l in less) {
                             //   debugPrint(l.toString());
                             // }
-
                             final notes = context.read<LessonNotes>();
                             final save = context.read<SaveSystem>();
                             final processor = context.read<GroupProcessor>();
-
                             notes.update(context);
                             save.saveLessons(controller.text);
                             processor.updateFromRaw(controller.text);
@@ -382,7 +379,7 @@ class _MainState extends State<Main> {
                           children: [
                             Align(
                               alignment: Alignment.centerRight,
-                              child: !manager.loggedIn
+                              child: !manager.loggedIn && !manager.offline
                                   ? OutlinedButton(
                                       onPressed: () {
                                         showLoginDialogSecure(context);
@@ -405,7 +402,7 @@ class _MainState extends State<Main> {
                                     ? "${manager.name!.split(" ")[1]} "
                                     : manager.userName ?? "Войдите в аккаунт",
                                 style: TextStyle(
-                                  color: ColorScheme.of(context).onSurface,
+                                  color: ColorScheme.of(context).surfaceVariant,
                                 ),
                               ),
                             ),

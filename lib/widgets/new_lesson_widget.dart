@@ -157,10 +157,15 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
                             children: [
                               const Divider(height: 8),
                               Row(
-                                children: const [
+                                children: [
                                   Icon(Icons.add),
                                   SizedBox(width: 4),
-                                  Text("Добавьте задачу для этого занятия"),
+                                  Text(
+                                    "Добавьте задачу для этого занятия",
+                                    style: TextStyle(
+                                      color: ColorScheme.of(context).onSurface,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ],

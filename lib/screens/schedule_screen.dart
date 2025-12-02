@@ -99,16 +99,16 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   @override
   Widget build(BuildContext context) {
     final processor = context.watch<GroupProcessor>();
+    // final manager = context.watch<SessionManager>();
     final selectedDay = processor.selectedDay ?? today;
     final days = processor.days;
-    if (!context.read<SessionManager>().loggedIn &&
-        !context.read<SessionManager>().offline) {
+    if (!days.isNotEmpty) {
       return Center(
         child: Column(
           spacing: 4,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.warning, size: 48),
+            Icon(Icons.percent, size: 48),
             Text("Войдите в аккунт"),
             ButtonM3E(
               onPressed: () {
