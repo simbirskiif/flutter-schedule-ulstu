@@ -63,7 +63,7 @@ List<Lesson> converDumpToLessons(List<DumpLesson> dumps) {
     int subgroup = subgroupMatch != null
         ? int.tryParse(subgroupMatch.group(1) ?? "0") ?? 0
         : 0;
-    name = name.replaceAll(RegExp(r'\d\s*п/г'), '').trim();
+    name = name.replaceAll(RegExp(r'(- )?\d\s*п/г'), '').trim();
     teacher = teacher.replaceAll(RegExp(r'\d\s*п/г'), '').trim();
     final lowerName = name.toLowerCase();
     LessonTypes lessonType;
