@@ -34,7 +34,6 @@ class SessionManager with ChangeNotifier {
 
   Future<void> logoutAndDropData(
     GroupProcessor processor,
-    LessonNotes notes,
     SaveSystem save,
   ) async {
     await logout();
@@ -43,7 +42,6 @@ class SessionManager with ChangeNotifier {
     name = null;
     group = null;
 
-    notes.clear();
     processor.clear();
     save.clear();
     notifyListeners();

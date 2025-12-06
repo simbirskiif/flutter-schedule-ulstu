@@ -54,9 +54,11 @@ void showSetupDialog(BuildContext context) {
                         context,
                         listen: false,
                       );
-                      final notes = Provider.of<LessonNotes>(context, listen: false);
-                      final save = Provider.of<SaveSystem>(context, listen: false);
-                      manager.logoutAndDropData(processor, notes, save);
+                      final save = Provider.of<SaveSystem>(
+                        context,
+                        listen: false,
+                      );
+                      manager.logoutAndDropData(processor, save);
                       Navigator.pop(context);
                     },
                     label: Text("Выйти и удалить данные"),

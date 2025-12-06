@@ -26,18 +26,6 @@ class SaveSystem {
     await _secure.deleteAll();
   }
 
-  void saveNotes(LessonNotes notes) {
-    String json = jsonEncode(notes);
-    _prefs.setString(notesKey, json);
-  }
-
-  LessonNotes loadNotes() {
-    String? json = _prefs.getString(notesKey);
-    if (json == null) return LessonNotes.empty();
-    var lst = jsonDecode(json);
-    return LessonNotes.fromJson(lst);
-  }
-
   void saveGroup(int n) => _prefs.setInt(groupKey, n);
   int? loadSubGroup() => _prefs.getInt(groupKey);
 

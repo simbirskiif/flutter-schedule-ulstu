@@ -1,31 +1,31 @@
-// ignore_for_file: unused_import, prefer_typing_uninitialized_variables, unnecessary_import, deprecated_member_use
-
-import 'dart:math';
-import 'package:animations/animations.dart';
-import 'package:expressive_refresh/expressive_refresh.dart';
 import 'package:flutter/material.dart';
-import 'package:timetable/main.dart';
-import 'package:timetable/models/note.dart';
-import 'package:timetable/models/lesson.dart';
 import 'package:timetable/widgets/note_widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:timetable/processors/group_processor.dart';
 
 class NotesScreen extends StatelessWidget {
   const NotesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Selector<LessonNotes, List<LessonID>>(
-      selector: (_, provider) => provider.keys.toList(),
-      builder: (context, keys, children) {
+    return Selector<GroupProcessor, int>(
+      selector: (_, provider) => provider.notesCount,
+      builder: (context, _, children) {
+        final lessons = context.watch<GroupProcessor>().lessons;
         return ListView.builder(
-          itemCount: keys.length,
-          itemBuilder: (_, index) => Align(
-            child: NoteWidget(
-              id: keys[index],
-              closedBuilder: LessonNoteView(id: keys[index]),
-            ),
-          ),
+          itemCount: lessons.length,
+          itemBuilder: (_, index) {
+            return Visibility(
+              visible: lessons[index].note != null,
+              // Если виджет не видно, то ListView.builder не вызовет конструктор. Поэтому ошибки не будет, даже если у lessons[index] нет note
+              child: Align(
+                child: NoteWidget(
+                  lesson: lessons[index],
+                  closedBuilder: LessonNoteView.construct,
+                ),
+              ),
+            );
+          },
         );
       },
     );

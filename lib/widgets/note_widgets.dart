@@ -3,13 +3,18 @@ import 'package:timetable/models/note.dart';
 import 'package:timetable/models/lesson.dart';
 import 'package:provider/provider.dart';
 import 'package:animations/animations.dart';
+import 'package:timetable/processors/group_processor.dart';
 import 'package:timetable/utils/color_utils.dart';
 import 'package:timetable/utils/day_of_week_table.dart';
 
 class NoteWidget extends StatelessWidget {
-  final LessonID id;
-  final Widget closedBuilder;
-  const NoteWidget({super.key, required this.id, required this.closedBuilder});
+  final Lesson lesson;
+  final Function closedBuilder;
+  const NoteWidget({
+    super.key,
+    required this.lesson,
+    required this.closedBuilder,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,18 +27,20 @@ class NoteWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
         ),
         closedColor: ColorScheme.of(context).surfaceVariant,
-        closedBuilder: (context, action) =>
-            GestureDetector(onTap: action, child: closedBuilder),
+        closedBuilder: (context, action) => GestureDetector(
+          onTap: action,
+          child: closedBuilder(lesson: lesson),
+        ),
         openBuilder: (context, action) =>
-            _FullScreenView(action: action, id: id),
+            _FullScreenView(action: action, lesson: lesson),
       ),
     );
   }
 }
 
 class LessonNoteView extends StatelessWidget {
-  final LessonID id;
-  const LessonNoteView({super.key, required this.id});
+  final Lesson lesson;
+  const LessonNoteView.construct({super.key, required this.lesson});
 
   @override
   Widget build(BuildContext context) {
@@ -45,34 +52,30 @@ class LessonNoteView extends StatelessWidget {
           padding: EdgeInsets.only(left: 26, right: 26, top: 10, bottom: 10),
           child: Column(
             children: [
-              Selector<LessonNotes, Note?>(
-                selector: (_, provider) => provider.getNote(id),
-                builder: (context, value, child) {
-                  return Column(
-                    children: [
-                      Text(
-                        value?.title ?? "",
-                        style: TextStyle(
-                          color: textColorForContainer(
-                            context,
-                            ColorScheme.of(context).surfaceVariant,
-                          ),
-                          fontSize: 16,
-                        ),
+              Selector<GroupProcessor, String?>(
+                selector: (_, provider) => provider.getNote(lesson)!.title,
+                builder: (context, title, child) {
+                  return Text(
+                    title ?? "",
+                    style: TextStyle(
+                      color: textColorForContainer(
+                        context,
+                        ColorScheme.of(context).surfaceVariant,
                       ),
-                      Text(
-                        '${DayOfWeekTable.get(id.day)} | ${id.index} пара',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: textColorForContainer(
-                            context,
-                            ColorScheme.of(context).surfaceVariant,
-                          ),
-                        ),
-                      ),
-                    ],
+                      fontSize: 16,
+                    ),
                   );
                 },
+              ),
+              Text(
+                '${DayOfWeekTable.get(lesson.day + 1)} | ${lesson.index + 1} пара',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: textColorForContainer(
+                    context,
+                    ColorScheme.of(context).surfaceVariant,
+                  ),
+                ),
               ),
             ],
           ),
@@ -83,25 +86,25 @@ class LessonNoteView extends StatelessWidget {
 }
 
 class ScheduleNoteView extends StatelessWidget {
-  final LessonID id;
-  const ScheduleNoteView({super.key, required this.id});
+  final Lesson lesson;
+  const ScheduleNoteView.construct({super.key, required this.lesson});
 
   @override
   Widget build(BuildContext context) {
-    return Selector<LessonNotes, String?>(
-      selector: (_, provider) => provider.getNote(id)?.content,
-      builder: (context, note, child) => Padding(
-        padding: EdgeInsets.only(top: 8),
-        child: SizedBox(
-          width: double.infinity,
-          height: 30,
-          child: Material(
-            borderRadius: BorderRadius.all(Radius.circular(8)),
-            color: ColorScheme.of(context).surfaceVariant,
-            child: Padding(
-              padding: EdgeInsets.only(left: 6, bottom: 6, right: 2),
-              child: Text(
-                note ?? "",
+    return Padding(
+      padding: EdgeInsets.only(top: 8),
+      child: SizedBox(
+        width: double.infinity,
+        height: 30,
+        child: Material(
+          borderRadius: BorderRadius.all(Radius.circular(8)),
+          color: ColorScheme.of(context).surfaceVariant,
+          child: Padding(
+            padding: EdgeInsets.only(left: 6, bottom: 6, right: 2),
+            child: Selector<GroupProcessor, Note?>(
+              selector: (context, provider) => provider.getNote(lesson),
+              builder: (context, note, child) => Text(
+                note?.content ?? "",
                 style: TextStyle(
                   color: textColorForContainer(
                     context,
@@ -122,8 +125,8 @@ class ScheduleNoteView extends StatelessWidget {
 
 class _FullScreenView extends StatefulWidget {
   final Function action;
-  final LessonID id;
-  const _FullScreenView({required this.action, required this.id});
+  final Lesson lesson;
+  const _FullScreenView({required this.action, required this.lesson});
 
   @override
   State<_FullScreenView> createState() => _FullScreenViewState();
@@ -132,9 +135,11 @@ class _FullScreenView extends StatefulWidget {
 class _FullScreenViewState extends State<_FullScreenView> {
   @override
   Widget build(BuildContext context) {
-    final notes = Provider.of<LessonNotes>(context, listen: false);
-    String content = notes.getNote(widget.id)?.content ?? "";
-    String title = notes.getNote(widget.id)?.title ?? "";
+    GroupProcessor processor = context.read<GroupProcessor>();
+    Note newNote = Note(
+      title: widget.lesson.note?.title ?? "",
+      content: widget.lesson.note?.content ?? "",
+    );
     return Scaffold(
       appBar: AppBar(),
       body: Center(
@@ -146,69 +151,13 @@ class _FullScreenViewState extends State<_FullScreenView> {
               child: Center(
                 child: Stack(
                   children: [
-                    Container(
-                      margin: EdgeInsets.all(30),
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            style: TextStyle(
-                              fontSize: 30,
-                              color: textColorForContainer(
-                                context,
-                                ColorScheme.of(context).surfaceVariant,
-                              ),
-                            ),
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                            ),
-                            initialValue: title,
-                            onChanged: (value) => title = value,
-                            textAlign: TextAlign.center,
-                          ),
-                          Text(
-                            '${DayOfWeekTable.get(widget.id.day)} | ${widget.id.index} пара',
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: textColorForContainer(
-                                context,
-                                ColorScheme.of(context).surfaceVariant,
-                              ),
-                            ),
-                          ),
-                          Divider(
-                            color: textColorForContainer(
-                              context,
-                              ColorScheme.of(context).surfaceVariant,
-                            ),
-                          ),
-                          Expanded(
-                            child: TextFormField(
-                              style: TextStyle(
-                                color: textColorForContainer(
-                                  context,
-                                  ColorScheme.of(context).surfaceVariant,
-                                ),
-                              ),
-                              initialValue: content,
-                              onChanged: (value) => content = value,
-                              expands: true,
-                              maxLines: null,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: 'Введите текст заметки',
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    _TextContainers(newNote, widget.lesson),
                     Container(
                       alignment: Alignment.bottomRight,
                       margin: EdgeInsets.all(30),
                       child: ElevatedButton(
                         onPressed: () {
-                          notes.setContent(widget.id, content, context);
-                          notes.setTitle(widget.id, title, context);
+                          processor.setNote(widget.lesson, newNote);
                           widget.action();
                         },
                         child: Text("Сохранить"),
@@ -219,7 +168,7 @@ class _FullScreenViewState extends State<_FullScreenView> {
                       margin: EdgeInsets.all(30),
                       child: ElevatedButton(
                         onPressed: () {
-                          notes.delNote(widget.id, context);
+                          processor.deleteNote(widget.lesson);
                           widget.action();
                         },
                         child: Text("Удалить"),
@@ -231,6 +180,71 @@ class _FullScreenViewState extends State<_FullScreenView> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _TextContainers extends StatelessWidget {
+  final Note newNote;
+  final Lesson lesson;
+
+  const _TextContainers(this.newNote, this.lesson);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.all(30),
+      child: Column(
+        children: [
+          TextFormField(
+            style: TextStyle(
+              fontSize: 30,
+              color: textColorForContainer(
+                context,
+                ColorScheme.of(context).surfaceVariant,
+              ),
+            ),
+            decoration: InputDecoration(border: InputBorder.none),
+            initialValue: newNote.title,
+            onChanged: (value) => newNote.title = value,
+            textAlign: TextAlign.center,
+          ),
+          Text(
+            '${DayOfWeekTable.get(lesson.day + 1)} | ${lesson.index + 1} пара',
+            style: TextStyle(
+              fontSize: 20,
+              color: textColorForContainer(
+                context,
+                ColorScheme.of(context).surfaceVariant,
+              ),
+            ),
+          ),
+          Divider(
+            color: textColorForContainer(
+              context,
+              ColorScheme.of(context).surfaceVariant,
+            ),
+          ),
+          Expanded(
+            child: TextFormField(
+              style: TextStyle(
+                color: textColorForContainer(
+                  context,
+                  ColorScheme.of(context).surfaceVariant,
+                ),
+              ),
+              initialValue: newNote.content,
+              onChanged: (value) => newNote.content = value,
+              expands: true,
+              maxLines: null,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: 'Введите текст заметки',
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

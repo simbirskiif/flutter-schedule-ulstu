@@ -9,6 +9,7 @@ import 'package:timetable/models/filter.dart';
 import 'package:timetable/models/lesson.dart';
 import 'package:timetable/save_system/save_system.dart';
 import 'package:timetable/utils/lessons.dart';
+import 'package:timetable/models/note.dart';
 import 'dart:math';
 
 import 'package:tuple/tuple.dart';
@@ -24,6 +25,46 @@ class GroupProcessor with ChangeNotifier {
   DateTime? _selectedDay;
   bool isLoading = false;
   int _currentSubgroup = 0;
+
+  GroupProcessor() {
+    _lessons = [];
+  }
+
+  void loadNotes(Map<String, Note> map) {
+    for (Lesson lesson in _lessons) {}
+  }
+
+  Note? getNote(Lesson lesson) => lesson.note;
+
+  void setNoteTitle(Lesson lesson, String title) {
+    if (lesson.note == null) return;
+    lesson.note!.title = title;
+    notifyListeners();
+  }
+
+  void setNoteContent(Lesson lesson, String content) {
+    if (lesson.note == null) return;
+    lesson.note!.content = content;
+    notifyListeners();
+  }
+
+  void setNote(Lesson lesson, Note note) {
+    lesson.note = note;
+    notifyListeners();
+  }
+
+  void deleteNote(Lesson lesson) {
+    lesson.note = null;
+    notifyListeners();
+  }
+
+  int get notesCount {
+    int n = 0;
+    for (var lesson in _lessons) {
+      if (lesson.note != null) ++n;
+    }
+    return n;
+  }
 
   void clear() {
     _lessons = [];
@@ -42,10 +83,6 @@ class GroupProcessor with ChangeNotifier {
 
   void updateSession(SessionManager session) {
     _session = session;
-  }
-
-  GroupProcessor() {
-    _lessons = [];
   }
 
   Future<Tuple2<OnlineStatus, List<Lesson>?>> getLessonsByGroup(

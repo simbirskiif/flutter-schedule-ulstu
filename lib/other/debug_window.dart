@@ -139,7 +139,9 @@ class _DebugWindowState extends State<DebugWindow> {
               ),
               ButtonM3E(
                 onPressed: () async {
-                  final zalupa = await groupProcessor.getLessonsByGroup("Подготовительные курсы");
+                  final zalupa = await groupProcessor.getLessonsByGroup(
+                    "Подготовительные курсы",
+                  );
                   debugPrint(zalupa.toString());
                   debugPrint(
                     GroupProcessor.getSubgroupCount(zalupa.item2!).toString(),

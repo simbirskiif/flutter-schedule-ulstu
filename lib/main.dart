@@ -42,7 +42,6 @@ void main() async {
   final groupProcessor = GroupProcessor();
   groupProcessor.getSaveSystem(saveSystem);
 
-  final lessonNotes = LessonNotes.empty();
   SessionManager sessionManager = SessionManager();
 
   //Provider.debugCheckInvalidValueType = null;
@@ -59,7 +58,6 @@ void main() async {
           update: (context, session, group) => group!..updateSession(session),
         ),
         // ListenableProvider<GroupProcessor>.value(value: GroupProcessor()),
-        ListenableProvider<LessonNotes>.value(value: lessonNotes),
         Provider<SaveSystem>.value(value: saveSystem),
         // ListenableProvider<SessionManager>.value(value: SessionManager()),
       ],
@@ -159,7 +157,6 @@ class _SplashScreenState extends State<SplashScreen> {
     final password = await save.getPassword();
 
     if (login != null && password != null) {
-      context.read<LessonNotes>();
       final status = await session.login(login, password);
 
       if (!mounted) return;
@@ -261,10 +258,8 @@ class _MainState extends State<Main> {
                             // for (final l in less) {
                             //   debugPrint(l.toString());
                             // }
-                            final notes = context.read<LessonNotes>();
                             final save = context.read<SaveSystem>();
                             final processor = context.read<GroupProcessor>();
-                            notes.update(context);
                             save.saveLessons(controller.text);
                             processor.updateFromRaw(controller.text);
                             processor.setSubgroup(2, context);
@@ -321,7 +316,7 @@ class _MainState extends State<Main> {
                         ),
                         NavigationRailDestination(
                           icon: Icon(Icons.notes),
-                          label: Text("Заметки????"),
+                          label: Text("Заметки"),
                         ),
                       ],
                       selectedIndex: _selectedScreen,
