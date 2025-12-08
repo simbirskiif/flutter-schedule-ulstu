@@ -172,7 +172,7 @@ class GroupProcessor with ChangeNotifier {
   void setSubgroup(int t, [BuildContext? context]) {
     _currentSubgroup = t.abs() > _subgroupsCount ? 0 : t;
     try {
-      _saveSystem.saveGroup(_currentSubgroup);
+      _saveSystem.saveSubGroup(_currentSubgroup);
     } catch (_) {
       // если _saveSystem не инициализирован — молча пропускаем
     }

@@ -73,7 +73,7 @@ class _FirstSetupDialogState extends State<FirstSetupDialog> {
     save.saveGroupName(group);
     // сохраняем подгруппу в SaveSystem (и GroupProcessor тоже сохранит)
     if (subgroup != -1) {
-      save.saveGroup(subgroup);
+      save.saveSubGroup(subgroup);
     }
 
     await processor.updateFromGroup();
