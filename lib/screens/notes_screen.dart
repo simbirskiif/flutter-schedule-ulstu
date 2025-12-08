@@ -31,9 +31,15 @@ class NotesScreen extends StatelessWidget {
               )
             : Center(
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.filter_list_off, size: 64),
-                    Text("Задач нет"),
+                    Text(
+                      "Задач нет",
+                      style: TextStyle(
+                        color: ColorScheme.of(context).onSurface,
+                      ),
+                    ),
                   ],
                 ),
               );

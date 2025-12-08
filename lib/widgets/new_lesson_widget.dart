@@ -10,6 +10,7 @@ import 'package:timetable/utils/color_utils.dart';
 import 'package:timetable/utils/lesson_time.dart';
 import 'package:timetable/utils/string_time_formatter.dart';
 import 'package:timetable/widgets/new_lesson_type_widget.dart';
+import 'package:timetable/widgets/remote_lesson_placeholder.dart';
 import 'note_widgets.dart';
 
 class NewLessonWidget extends StatefulWidget {
@@ -111,17 +112,27 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
                             ),
                           ),
                         ),
-                        Text(
-                          widget.lesson.room,
-                          style: TextStyle(
-                            color: textColorForContainer(
-                              context,
-                              ColorScheme.of(context).surfaceVariant,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 2),
-                        const Icon(Icons.door_back_door_outlined, size: 16),
+                        !widget.lesson.isRemote
+                            ? Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    widget.lesson.room,
+                                    style: TextStyle(
+                                      color: textColorForContainer(
+                                        context,
+                                        ColorScheme.of(context).surfaceVariant,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 2),
+                                  const Icon(
+                                    Icons.door_back_door_outlined,
+                                    size: 16,
+                                  ),
+                                ],
+                              )
+                            : RemoteLessonPlaceholder(),
                       ],
                     ),
                     if (relativeTime.status != LessonTimeStatus.complete)

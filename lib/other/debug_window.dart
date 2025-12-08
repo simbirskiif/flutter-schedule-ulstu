@@ -9,8 +9,10 @@ import 'package:timetable/enum/online_status.dart';
 import 'package:timetable/models/lesson.dart';
 import 'package:timetable/processors/group_processor.dart';
 import 'package:timetable/widgets/lesson_type_widget.dart';
+import 'package:timetable/widgets/new_lesson_type_widget.dart';
 import 'package:timetable/widgets/new_lesson_widget.dart';
 import 'package:timetable/utils/color_utils.dart';
+import 'package:timetable/widgets/remote_lesson_placeholder.dart';
 import 'package:timetable/widgets/segmented_buttons.dart';
 
 class DebugWindow extends StatefulWidget {
@@ -148,6 +150,10 @@ class _DebugWindowState extends State<DebugWindow> {
                   );
                 },
                 label: Text("Получить занятия"),
+              ),
+              RemoteLessonPlaceholder(), NewLessonTypeWidget(
+                lessonType: LessonTypes.practice,
+                subgroup: 2,
               ),
             ],
           ),
