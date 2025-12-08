@@ -6,6 +6,7 @@ import 'package:animations/animations.dart';
 import 'package:timetable/processors/group_processor.dart';
 import 'package:timetable/utils/color_utils.dart';
 import 'package:timetable/utils/day_of_week_table.dart';
+import 'package:timetable/save_system/save_system.dart';
 
 class NoteWidget extends StatelessWidget {
   final Lesson lesson;
@@ -136,6 +137,7 @@ class _FullScreenViewState extends State<_FullScreenView> {
   @override
   Widget build(BuildContext context) {
     GroupProcessor processor = context.read<GroupProcessor>();
+    SaveSystem save = context.read<SaveSystem>();
     Note newNote = Note(
       title: widget.lesson.note?.title ?? "",
       content: widget.lesson.note?.content ?? "",
@@ -158,6 +160,7 @@ class _FullScreenViewState extends State<_FullScreenView> {
                       child: ElevatedButton(
                         onPressed: () {
                           processor.setNote(widget.lesson, newNote);
+                          save.saveNotes(processor.lessons);
                           widget.action();
                         },
                         child: Text("Сохранить"),
@@ -169,6 +172,7 @@ class _FullScreenViewState extends State<_FullScreenView> {
                       child: ElevatedButton(
                         onPressed: () {
                           processor.deleteNote(widget.lesson);
+                          save.saveNotes(processor.lessons);
                           widget.action();
                         },
                         child: Text("Удалить"),

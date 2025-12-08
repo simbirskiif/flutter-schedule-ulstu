@@ -1,5 +1,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:timetable/models/note.dart';
+import 'dart:convert';
+import 'package:timetable/models/lesson.dart';
 
 class SaveSystem {
   late FlutterSecureStorage _secure;
@@ -37,6 +40,36 @@ class SaveSystem {
     } else {
       _prefs.setString(groupNameKey, name);
     }
+  }
+
+  void saveNotes(List<Lesson> lessons) {
+    Map<String, dynamic> map = {};
+    for (var lesson in lessons) {
+      if (lesson.note != null) {
+        map[lesson.toString()] = {
+          'title': lesson.note!.title,
+          'content': lesson.note!.content,
+        };
+      }
+    }
+
+    String json = jsonEncode(map);
+    _prefs.setString(notesKey, json);
+  }
+
+  Map<String, Note> loadNotes() {
+    Map<String, Note> map = {};
+    String? raw = _prefs.getString(notesKey);
+    if (raw == null) return map;
+
+    Map<String, dynamic> decoded = jsonDecode(raw);
+    for (var entry in decoded.entries) {
+      map[entry.key] = Note(
+        title: entry.value['title'],
+        content: entry.value['content'],
+      );
+    }
+    return map;
   }
 
   String? loadGroupName() => _prefs.getString(groupNameKey);
