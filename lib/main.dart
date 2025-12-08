@@ -436,7 +436,7 @@ class _MainState extends State<Main> {
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: ListTile(
                     leading: Icon(Icons.task),
-                    title: Text("Включить отображение меню задач"),
+                    title: Text("Показывать меню задач"),
                     trailing: Switch(
                       value: tasksSettings?.tasksEnabled ?? true,
                       onChanged: (bool value) {
@@ -446,6 +446,39 @@ class _MainState extends State<Main> {
                     onTap: () {
                       tasksSettings?.tasksEnabled =
                           !(tasksSettings.tasksEnabled);
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: ListTile(
+                    leading: Icon(Icons.check_box_outline_blank),
+                    title: Text("Показывать \"окна\""),
+                    trailing: Switch(
+                      value: tasksSettings?.skipEnabled ?? true,
+                      onChanged: (bool value) {
+                        tasksSettings?.skipEnabled = value;
+                      },
+                    ),
+                    onTap: () {
+                      tasksSettings?.skipEnabled = !(tasksSettings.skipEnabled);
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: ListTile(
+                    leading: Icon(Icons.arrow_downward),
+                    title: Text("Показывать, к какой паре приходить"),
+                    trailing: Switch(
+                      value: tasksSettings?.firstSkipEnabled ?? true,
+                      onChanged: (bool value) {
+                        tasksSettings?.firstSkipEnabled = value;
+                      },
+                    ),
+                    onTap: () {
+                      tasksSettings?.firstSkipEnabled =
+                          !(tasksSettings.firstSkipEnabled);
                     },
                   ),
                 ),

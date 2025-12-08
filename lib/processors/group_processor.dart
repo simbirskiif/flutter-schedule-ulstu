@@ -31,7 +31,7 @@ class GroupProcessor with ChangeNotifier {
   }
 
   void loadNotes(Map<String, Note> map) {
-    for (Lesson lesson in _lessons) {}
+    // for (Lesson lesson in _lessons) {}
   }
 
   Note? getNote(Lesson lesson) => lesson.note;

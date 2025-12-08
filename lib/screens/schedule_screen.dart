@@ -16,10 +16,14 @@ import 'package:timetable/api/session_manager.dart';
 import 'package:timetable/dialog/fitst_setup_dialog.dart';
 import 'package:timetable/dialog/login_dialog.dart';
 import 'package:timetable/main.dart';
+import 'package:timetable/models/lesson_transfer.dart';
 import 'package:timetable/processors/group_processor.dart';
+import 'package:timetable/settings/tasks_settings.dart';
 import 'package:timetable/utils/lessons.dart';
 import 'package:timetable/utils/string_time_formatter.dart';
 import 'package:timetable/widgets/new_lesson_widget.dart';
+import 'package:timetable/widgets/skip_first_widget.dart';
+import 'package:timetable/widgets/skip_widget.dart';
 
 class ScheduleScreen extends StatefulWidget {
   const ScheduleScreen({super.key});
@@ -101,6 +105,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   @override
   Widget build(BuildContext context) {
+    TasksSettings settings = Provider.of<TasksSettings>(context);
     final processor = context.watch<GroupProcessor>();
     // final manager = context.watch<SessionManager>();
     final selectedDay = processor.selectedDay ?? today;
@@ -407,16 +412,70 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                               ),
                             ),
                           )
-                        : ListView.builder(
-                            itemCount: lessons.length,
-                            itemBuilder: (_, index) {
-                              return Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
-                                child: NewLessonWidget(lesson: lessons[index]),
+                        : Builder(
+                            builder: (context) {
+                              debugPrint(transferLessons(lessons).toString());
+                              final transferredLessons = transferLessons(
+                                lessons,
                               );
+                              return ListView.builder(
+                                itemCount: transferredLessons.length + 1,
+                                itemBuilder: (_, i) {
+                                  return i > transferredLessons.length - 1
+                                      ? SizedBox(height: 100)
+                                      : transferredLessons[i].skip != null
+                                      ? i != 0
+                                            ? settings.skipEnabled
+                                                  ? Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                            8.0,
+                                                          ),
+                                                      child: SkipWidget(
+                                                        skip:
+                                                            transferredLessons[i]
+                                                                .skip!,
+                                                      ),
+                                                    )
+                                                  : SizedBox.shrink()
+                                            : settings.firstSkipEnabled
+                                            ? Padding(
+                                                padding: const EdgeInsets.all(
+                                                  8.0,
+                                                ),
+                                                child: SkipFirstWidget(
+                                                  skip: transferredLessons[i]
+                                                      .skip!,
+                                                ),
+                                              )
+                                            : SizedBox.shrink()
+                                      : Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                            vertical: 8,
+                                          ),
+                                          child: NewLessonWidget(
+                                            lesson:
+                                                transferredLessons[i].lesson!,
+                                          ),
+                                        );
+                                },
+                              );
+
+                              // return ListView.builder(
+                              //   itemCount: lessons.length,
+                              //   itemBuilder: (_, index) {
+                              //     return Padding(
+                              //       padding: EdgeInsets.symmetric(
+                              //         horizontal: 16,
+                              //         vertical: 8,
+                              //       ),
+                              //       child: NewLessonWidget(
+                              //         lesson: lessons[index],
+                              //       ),
+                              //     );
+                              //   },
+                              // );
                             },
                           ),
                     // child: ListView.builder(

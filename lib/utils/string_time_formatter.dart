@@ -117,3 +117,15 @@ String dayFormat(DateTime date) {
     return DateFormat("EEEE, d.MM", "ru").format(date);
   }
 }
+
+String skipLessonsFormatter(int skip) {
+  return Intl.plural(
+    skip,
+    zero: 'Окно: $skip пар',
+    one: 'Окно: $skip пара',
+    few: 'Окно: $skip пары',
+    many: 'Окно: $skip пар',
+    other: 'Окно: $skip пар',
+    locale: 'ru',
+  );
+}
