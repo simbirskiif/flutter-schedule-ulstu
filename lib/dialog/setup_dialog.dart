@@ -11,64 +11,110 @@ void showSetupDialog(BuildContext context) {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: Text("Управление"),
+        title: Text(
+          "Управление",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: ColorScheme.of(context).onSurface,
+          ),
+        ),
         content: Column(
           spacing: 4,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: ButtonM3E(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      showFirstSetupDialog(context);
-                    },
-                    label: Row(
-                      children: [
-                        Text(
-                          "Перейти к выбору группы и подгруппы",
-                          softWrap: true,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                    icon: Icon(Icons.edit),
-                    style: ButtonM3EStyle.filled,
-                  ),
-                ),
-              ],
+            FilledButton.icon(
+              onPressed: () {
+                Navigator.pop(context);
+                showFirstSetupDialog(context);
+              },
+              icon: Icon(Icons.edit),
+              label: Text("Изменить группу и подгруппу"),
             ),
-            Row(
-              children: [
-                Expanded(
-                  child: ButtonM3E(
-                    onPressed: () {
-                      final manager = Provider.of<SessionManager>(
-                        context,
-                        listen: false,
-                      );
-                      final processor = Provider.of<GroupProcessor>(
-                        context,
-                        listen: false,
-                      );
-                      final save = Provider.of<SaveSystem>(
-                        context,
-                        listen: false,
-                      );
-                      manager.logoutAndDropData(processor, save);
-                      Navigator.pop(context);
-                    },
-                    label: Text("Выйти и удалить данные"),
-                    icon: Icon(Icons.logout),
-                    style: ButtonM3EStyle.outlined,
-                  ),
-                ),
-              ],
+            OutlinedButton.icon(
+              onPressed: () {
+                final manager = Provider.of<SessionManager>(
+                  context,
+                  listen: false,
+                );
+                final processor = Provider.of<GroupProcessor>(
+                  context,
+                  listen: false,
+                );
+                final save = Provider.of<SaveSystem>(context, listen: false);
+                manager.logoutAndDropData(processor, save);
+                Navigator.pop(context);
+              },
+              icon: Icon(Icons.logout),
+              label: Text("Выйти и удалить данные"),
             ),
+            // Row(
+            //   children: [
+            //     Expanded(
+            //       child: ButtonM3E(
+            //         onPressed: () {
+            //           Navigator.pop(context);
+            //           showFirstSetupDialog(context);
+            //         },
+            //         label: Row(
+            //           children: [
+            //             Text(
+            //               "Изменить группу и подгруппу",
+            //               softWrap: true,
+            //               maxLines: 2,
+            //               overflow: TextOverflow.ellipsis,
+            //             ),
+            //           ],
+            //         ),
+            //         icon: Icon(Icons.edit),
+            //         style: ButtonM3EStyle.filled,
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            // Row(
+            //   children: [
+            //     Expanded(
+            //       child: MaterialButton(
+            //         onPressed: () {
+            //           final manager = Provider.of<SessionManager>(
+            //             context,
+            //             listen: false,
+            //           );
+            //           final processor = Provider.of<GroupProcessor>(
+            //             context,
+            //             listen: false,
+            //           );
+            //           final save = Provider.of<SaveSystem>(
+            //             context,
+            //             listen: false,
+            //           );
+            //           manager.logoutAndDropData(processor, save);
+            //           Navigator.pop(context);
+            //         },
+            //         child: Row(
+            //           // mainAxisSize: MainAxisSize.min,
+            //           children: [
+            //             Text("Выйти и удалить данные"),
+            //             Icon(Icons.logout),
+            //           ],
+            //         ),
+            //         // label: Expanded(child: Text("Выйти и удалить данные")),
+            //         // icon: Icon(Icons.logout),
+            //         // style: ButtonM3EStyle.outlined,
+            //       ),
+            //     ),
+            //   ],
+            // ),
           ],
         ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("Закрыть"),
+          ),
+        ],
       );
     },
   );

@@ -96,3 +96,24 @@ String formatRelativeDuration(Duration difference, LessonTimeStatus status) {
 
   return '$prefix$timeString$suffix';
 }
+
+String dayFormat(DateTime date) {
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  final tomorrow =today.add(Duration(days: 1));
+  final yesterday = today.subtract(Duration(days: 1));
+  final afterTomorrow = today.add(Duration(days: 2));
+  DateTime d = DateTime(date.year, date.month, date.day);
+
+  if (d == today) {
+    return 'Сегодня';
+  } else if (d == tomorrow) {
+    return 'Завтра';
+  } else if (d == afterTomorrow) {
+    return 'Послезавтра';
+  } else if (d == yesterday) {
+    return 'Вчера';
+  } else {
+    return DateFormat("EEEE, d.MM", "ru").format(date);
+  }
+}
