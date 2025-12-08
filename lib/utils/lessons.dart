@@ -126,3 +126,12 @@ DateTime lessonDateTime(int week, int day, int index) {
     time.inMinutes % 60,
   );
 }
+int getWeekFromDate(DateTime date) {
+  final now = DateTime.now();
+  final int startYear = now.month >= 9 ? now.year : now.year - 1;
+  final weekStart = DateTime(startYear, 9, 1);
+  if (date.isBefore(weekStart)) return 1;
+  final diffDays = date.difference(weekStart).inDays;
+  final week = (diffDays ~/ 7) + 1;
+  return week;
+}

@@ -6,6 +6,7 @@ import 'package:button_m3e/button_m3e.dart';
 import 'package:expressive_refresh/expressive_refresh.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_indicator_m3e/loading_indicator_m3e.dart';
 import 'package:progress_indicator_m3e/progress_indicator_m3e.dart';
@@ -16,6 +17,8 @@ import 'package:timetable/dialog/fitst_setup_dialog.dart';
 import 'package:timetable/dialog/login_dialog.dart';
 import 'package:timetable/main.dart';
 import 'package:timetable/processors/group_processor.dart';
+import 'package:timetable/utils/lessons.dart';
+import 'package:timetable/utils/string_time_formatter.dart';
 import 'package:timetable/widgets/new_lesson_widget.dart';
 
 class ScheduleScreen extends StatefulWidget {
@@ -108,15 +111,18 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           spacing: 4,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.percent, size: 48),
-            Text("Войдите в аккунт"),
+            Icon(Icons.login, size: 48),
+            Text(
+              "Войдите в аккаунт",
+              style: TextStyle(color: ColorScheme.of(context).onSurface),
+            ),
             ButtonM3E(
               onPressed: () {
                 showLoginDialogSecure(context);
               },
               label: Text("Войти"),
               style: ButtonM3EStyle.outlined,
-              icon: Icon(Icons.login),
+              icon: Icon(Icons.key_rounded),
             ),
           ],
         ),
@@ -154,6 +160,37 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     }
     return Column(
       children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+          child: Row(
+            children: [
+              Builder(
+                builder: (context) {
+                  int week = getWeekFromDate(selectedDay);
+                  // for (var lesson in processor.lessons) {
+                  //   if (lesson.dateTime.day == selectedDay.day &&
+                  //       lesson.dateTime.month == selectedDay.month &&
+                  //       lesson.dateTime.year == selectedDay.year) {
+                  //     week = lesson.week;
+                  //   }
+                  // }
+                  return Text(
+                    "$week-я неделя",
+                    style: TextStyle(
+                      color: ColorScheme.of(context).onSurface,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  );
+                },
+              ),
+              Spacer(),
+              Text(
+                dayFormat(selectedDay),
+                style: TextStyle(color: ColorScheme.of(context).onSurface),
+              ),
+            ],
+          ),
+        ),
         Padding(
           padding: EdgeInsetsGeometry.symmetric(horizontal: 20),
           child: TableCalendar(
