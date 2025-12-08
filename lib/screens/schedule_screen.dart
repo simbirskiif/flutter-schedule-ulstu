@@ -158,265 +158,318 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         });
       }
     }
-    return Column(
+    return Stack(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-          child: Row(
-            children: [
-              Builder(
-                builder: (context) {
-                  int week = getWeekFromDate(selectedDay);
-                  // for (var lesson in processor.lessons) {
-                  //   if (lesson.dateTime.day == selectedDay.day &&
-                  //       lesson.dateTime.month == selectedDay.month &&
-                  //       lesson.dateTime.year == selectedDay.year) {
-                  //     week = lesson.week;
-                  //   }
-                  // }
-                  return Text(
-                    "$week-я неделя",
-                    style: TextStyle(
-                      color: ColorScheme.of(context).onSurface,
-                      fontWeight: FontWeight.bold,
-                    ),
+        Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              child: Row(
+                children: [
+                  Builder(
+                    builder: (context) {
+                      int week = getWeekFromDate(selectedDay);
+                      // for (var lesson in processor.lessons) {
+                      //   if (lesson.dateTime.day == selectedDay.day &&
+                      //       lesson.dateTime.month == selectedDay.month &&
+                      //       lesson.dateTime.year == selectedDay.year) {
+                      //     week = lesson.week;
+                      //   }
+                      // }
+                      return Text(
+                        "$week-я неделя",
+                        style: TextStyle(
+                          color: ColorScheme.of(context).onSurface,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    },
+                  ),
+                  Spacer(),
+                  Text(
+                    dayFormat(selectedDay),
+                    style: TextStyle(color: ColorScheme.of(context).onSurface),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsetsGeometry.symmetric(horizontal: 20),
+              child: TableCalendar(
+                focusedDay: selectedDay,
+                selectedDayPredicate: (day) {
+                  return day.year == selectedDay.year &&
+                      day.month == selectedDay.month &&
+                      day.day == selectedDay.day;
+                },
+                calendarBuilders: CalendarBuilders(
+                  defaultBuilder: (context, day, focusedDay) {
+                    final weekDay = DateFormat("E", "ru").format(day);
+                    return Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 5),
+                          Text(
+                            weekDay,
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: ColorScheme.of(
+                                context,
+                              ).onSecondaryContainer,
+                            ),
+                          ),
+                          SizedBox(height: 0),
+                          Text(
+                            "${day.day}",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: ColorScheme.of(
+                                context,
+                              ).onSecondaryContainer,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  selectedBuilder: (context, day, focusedDay) {
+                    final weekDay = DateFormat("E", "ru").format(day);
+                    return SizedBox(
+                      width: 45,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 0,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary,
+                          shape: BoxShape.rectangle,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Column(
+                          children: [
+                            SizedBox(height: 5),
+                            Text(
+                              weekDay,
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: ColorScheme.of(context).onSecondary,
+                              ),
+                            ),
+                            SizedBox(height: 0),
+                            Text(
+                              "${day.day}",
+                              style: TextStyle(
+                                color: ColorScheme.of(context).onPrimary,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  todayBuilder: (context, day, focusedDay) {
+                    final weekDay = DateFormat("E", "ru").format(day);
+                    return Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 5),
+                          Text(
+                            weekDay,
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: ColorScheme.of(
+                                context,
+                              ).onSecondaryContainer,
+                            ),
+                          ),
+                          SizedBox(height: 0),
+                          Text(
+                            "${day.day}",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: ColorScheme.of(
+                                context,
+                              ).onSecondaryContainer,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                calendarStyle: CalendarStyle(
+                  defaultDecoration: BoxDecoration(
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+                  disabledDecoration: BoxDecoration(
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+                  withinRangeDecoration: BoxDecoration(
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+                  outsideDecoration: BoxDecoration(
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+                  weekendDecoration: BoxDecoration(
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+                  todayDecoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.secondary,
+                    // border: Border.all(width: 10, ),
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+                  selectedDecoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary,
+                    // border: Border.all(width: 10, ),
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+                ),
+                firstDay: days.first,
+                lastDay: days.last,
+                calendarFormat: CalendarFormat.week,
+                startingDayOfWeek: StartingDayOfWeek.monday,
+                headerVisible: false,
+                daysOfWeekVisible: false,
+                locale: Localizations.localeOf(context).languageCode,
+                onDaySelected: (newSelectedDay, focusedDay) {
+                  processor.setSelectedDay(newSelectedDay);
+                  int pageIndex = days.indexWhere((day) {
+                    return day.year == newSelectedDay.year &&
+                        day.month == newSelectedDay.month &&
+                        day.day == newSelectedDay.day;
+                  });
+                  if (pageIndex != -1) {
+                    _pageController.animateToPage(
+                      pageIndex,
+                      duration: Duration(milliseconds: 500),
+                      curve: Curves.easeInOut,
+                    );
+                  }
+                },
+              ),
+            ),
+            // MaterialButton(
+            //   child: Icon(Icons.update),
+            //   onPressed: () {
+            //     refreshKey.currentState?.show();
+            //   },
+            // ),
+            Expanded(
+              child: PageView.builder(
+                itemCount: days.length,
+                pageSnapping: true,
+                key: PageStorageKey("1"),
+                controller: _pageController,
+                onPageChanged: (value) {
+                  final processor = context.read<GroupProcessor>();
+                  setState(() {
+                    _currentPage = value;
+                  });
+                  // selectedDayNotifier.value = _days[value];
+                  // focusedDayNotifier.value = _days[value];
+                  processor.setSelectedDay(processor.days[value]);
+                },
+                itemBuilder: (context, index) {
+                  DateTime pageDay = days[index];
+                  final lessons = processor.getLessonsForDay(pageDay);
+                  return ExpressiveRefreshIndicator.contained(
+                    edgeOffset: 0.5,
+                    backgroundColor: ColorScheme.of(context).primaryContainer,
+                    color: ColorScheme.of(context).onPrimaryContainer,
+                    key: index == _currentPage ? refreshKey : null,
+                    onRefresh: _onRefresh,
+                    child: lessons.isEmpty
+                        ? Center(
+                            child: Text(
+                              "Нет данных для этого дня",
+                              style: TextStyle(
+                                color: ColorScheme.of(context).onBackground,
+                              ),
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: lessons.length,
+                            itemBuilder: (_, index) {
+                              return Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                                child: NewLessonWidget(lesson: lessons[index]),
+                              );
+                            },
+                          ),
+                    // child: ListView.builder(
+                    //   physics: BouncingScrollPhysics(
+                    //     decelerationRate: ScrollDecelerationRate.normal,
+                    //   ),
+                    //   itemCount: 20,
+                    //   itemBuilder: (_, i) {
+                    //     return ListTile(title: Text("Page: $index,Element: $i"));
+                    //   },
+                    // ),
                   );
                 },
               ),
-              Spacer(),
-              Text(
-                dayFormat(selectedDay),
-                style: TextStyle(color: ColorScheme.of(context).onSurface),
-              ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: EdgeInsetsGeometry.symmetric(horizontal: 20),
-          child: TableCalendar(
-            focusedDay: selectedDay,
-            selectedDayPredicate: (day) {
-              return day.year == selectedDay.year &&
-                  day.month == selectedDay.month &&
-                  day.day == selectedDay.day;
-            },
-            calendarBuilders: CalendarBuilders(
-              defaultBuilder: (context, day, focusedDay) {
-                final weekDay = DateFormat("E", "ru").format(day);
-                return Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    children: [
-                      SizedBox(height: 5),
-                      Text(
-                        weekDay,
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: ColorScheme.of(context).onSecondaryContainer,
-                        ),
-                      ),
-                      SizedBox(height: 0),
-                      Text(
-                        "${day.day}",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: ColorScheme.of(context).onSecondaryContainer,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-              selectedBuilder: (context, day, focusedDay) {
-                final weekDay = DateFormat("E", "ru").format(day);
-                return SizedBox(
-                  width: 45,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary,
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      children: [
-                        SizedBox(height: 5),
-                        Text(
-                          weekDay,
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: ColorScheme.of(context).onSecondary,
-                          ),
-                        ),
-                        SizedBox(height: 0),
-                        Text(
-                          "${day.day}",
-                          style: TextStyle(
-                            color: ColorScheme.of(context).onPrimary,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-              todayBuilder: (context, day, focusedDay) {
-                final weekDay = DateFormat("E", "ru").format(day);
-                return Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    children: [
-                      SizedBox(height: 5),
-                      Text(
-                        weekDay,
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: ColorScheme.of(context).onSecondaryContainer,
-                        ),
-                      ),
-                      SizedBox(height: 0),
-                      Text(
-                        "${day.day}",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: ColorScheme.of(context).onSecondaryContainer,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
             ),
-            calendarStyle: CalendarStyle(
-              defaultDecoration: BoxDecoration(
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-              ),
-              disabledDecoration: BoxDecoration(
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-              ),
-              withinRangeDecoration: BoxDecoration(
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-              ),
-              outsideDecoration: BoxDecoration(
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-              ),
-              weekendDecoration: BoxDecoration(
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-              ),
-              todayDecoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.secondary,
-                // border: Border.all(width: 10, ),
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-              ),
-              selectedDecoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-                // border: Border.all(width: 10, ),
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-              ),
-            ),
-            firstDay: days.first,
-            lastDay: days.last,
-            calendarFormat: CalendarFormat.week,
-            startingDayOfWeek: StartingDayOfWeek.monday,
-            headerVisible: false,
-            daysOfWeekVisible: false,
-            locale: Localizations.localeOf(context).languageCode,
-            onDaySelected: (newSelectedDay, focusedDay) {
-              processor.setSelectedDay(newSelectedDay);
-              int pageIndex = days.indexWhere((day) {
-                return day.year == newSelectedDay.year &&
-                    day.month == newSelectedDay.month &&
-                    day.day == newSelectedDay.day;
-              });
-              if (pageIndex != -1) {
-                _pageController.animateToPage(
-                  pageIndex,
-                  duration: Duration(milliseconds: 500),
-                  curve: Curves.easeInOut,
-                );
-              }
-            },
-          ),
+          ],
         ),
-        // MaterialButton(
-        //   child: Icon(Icons.update),
-        //   onPressed: () {
-        //     refreshKey.currentState?.show();
-        //   },
-        // ),
-        Expanded(
-          child: PageView.builder(
-            itemCount: days.length,
-            pageSnapping: true,
-            key: PageStorageKey("1"),
-            controller: _pageController,
-            onPageChanged: (value) {
-              final processor = context.read<GroupProcessor>();
-              setState(() {
-                _currentPage = value;
-              });
-              // selectedDayNotifier.value = _days[value];
-              // focusedDayNotifier.value = _days[value];
-              processor.setSelectedDay(processor.days[value]);
-            },
-            itemBuilder: (context, index) {
-              DateTime pageDay = days[index];
-              final lessons = processor.getLessonsForDay(pageDay);
-              return ExpressiveRefreshIndicator.contained(
-                edgeOffset: 0.5,
-                backgroundColor: ColorScheme.of(context).primaryContainer,
-                color: ColorScheme.of(context).onPrimaryContainer,
-                key: index == _currentPage ? refreshKey : null,
-                onRefresh: _onRefresh,
-                child: lessons.isEmpty
-                    ? Center(
-                        child: Text(
-                          "Нет данных для этого дня",
-                          style: TextStyle(
-                            color: ColorScheme.of(context).onBackground,
-                          ),
-                        ),
-                      )
-                    : ListView.builder(
-                        itemCount: lessons.length,
-                        itemBuilder: (_, index) {
-                          return Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                            child: NewLessonWidget(lesson: lessons[index]),
-                          );
-                        },
-                      ),
-                // child: ListView.builder(
-                //   physics: BouncingScrollPhysics(
-                //     decelerationRate: ScrollDecelerationRate.normal,
-                //   ),
-                //   itemCount: 20,
-                //   itemBuilder: (_, i) {
-                //     return ListTile(title: Text("Page: $index,Element: $i"));
-                //   },
-                // ),
+        Positioned(
+          bottom: 16,
+          right: 16,
+          child: AnimatedSwitcher(
+            duration: Duration(milliseconds: 200),
+            transitionBuilder: (child, animation) {
+              return ScaleTransition(
+                scale: animation,
+                child: FadeTransition(opacity: animation, child: child),
               );
             },
+            child:
+                days.indexWhere(
+                      (day) =>
+                          day.year == today.year &&
+                          day.month == today.month &&
+                          day.day == today.day,
+                    ) !=
+                    _currentPage
+                ? FloatingActionButton(
+                    onPressed: () {
+                      _pageController.animateToPage(
+                        days.indexWhere(
+                          (day) =>
+                              day.year == today.year &&
+                              day.month == today.month &&
+                              day.day == today.day,
+                        ),
+                        duration: Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                    tooltip: "Перейти к сегодняшнему дню",
+                    child: Icon(Icons.refresh),
+                  )
+                : SizedBox(),
           ),
         ),
       ],

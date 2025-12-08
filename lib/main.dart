@@ -214,64 +214,69 @@ class _MainState extends State<Main> {
   @override
   Widget build(BuildContext context) {
     _smallScreen = MediaQuery.of(context).size.width < 650 ? true : false;
+    GroupProcessor processor = Provider.of<GroupProcessor>(context);
+    SessionManager session = Provider.of<SessionManager>(context);
     return Builder(
       builder: (innerContext) {
         return Scaffold(
           appBar: AppBar(
-            title: Text("Test"),
+            title: Text(
+              processor.groupName != null
+                  ? session.group!
+                  : "Расписание",
+            ),
             actions: [
-              // ExpressiveLoadingIndicator(),
-              MaterialButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return DebugWindow();
-                      },
-                    ),
-                  );
-                },
-                child: Icon(Icons.bug_report),
-              ),
-              MaterialButton(
-                onPressed: () {
-                  final controller = TextEditingController();
-                  showDialog(
-                    context: innerContext,
-                    builder: (context) => AlertDialog(
-                      title: Text("JSON"),
-                      content: TextField(
-                        controller: controller,
-                        decoration: InputDecoration(hintText: "JSON полный"),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text("Отмена"),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            // final d = decodeJSON(controller.text);
-                            // List<Lesson> less = converDumpToLessons(d);
-                            // less = getLessonsByFilter(Filter(), less);
-                            // for (final l in less) {
-                            //   debugPrint(l.toString());
-                            // }
-                            final save = context.read<SaveSystem>();
-                            final processor = context.read<GroupProcessor>();
-                            save.saveLessons(controller.text);
-                            processor.updateFromRaw(controller.text);
-                            processor.setSubgroup(2, context);
-                          },
-                          child: Text("Принять"),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-                child: Icon(Icons.code),
-              ),
+              // MaterialButton(
+              //   onPressed: () {
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         builder: (context) {
+              //           return DebugWindow();
+              //         },
+              //       ),
+              //     );
+              //   },
+              //   child: Icon(Icons.bug_report),
+              // ),
+              // MaterialButton(
+              //   onPressed: () {
+              //     final controller = TextEditingController();
+              //     showDialog(
+              //       context: innerContext,
+              //       builder: (context) => AlertDialog(
+              //         title: Text("JSON"),
+              //         content: TextField(
+              //           controller: controller,
+              //           decoration: InputDecoration(hintText: "JSON полный"),
+              //         ),
+              //         actions: [
+              //           TextButton(
+              //             onPressed: () => Navigator.pop(context),
+              //             child: Text("Отмена"),
+              //           ),
+              //           TextButton(
+              //             onPressed: () {
+              //               // final d = decodeJSON(controller.text);
+              //               // List<Lesson> less = converDumpToLessons(d);
+              //               // less = getLessonsByFilter(Filter(), less);
+              //               // for (final l in less) {
+              //               //   debugPrint(l.toString());
+              //               // }
+              //               final save = context.read<SaveSystem>();
+              //               final processor = context.read<GroupProcessor>();
+              //               save.saveLessons(controller.text);
+              //               processor.updateFromRaw(controller.text);
+              //               processor.setSubgroup(2, context);
+              //             },
+              //             child: Text("Принять"),
+              //           ),
+              //         ],
+              //       ),
+              //     );
+              //   },
+              //   child: Icon(Icons.code),
+              // ),
               IconButton(
                 onPressed: () {
                   showBottomSheet(innerContext);
@@ -290,7 +295,7 @@ class _MainState extends State<Main> {
                     ),
                     NavigationDestination(
                       icon: Icon(Icons.notes),
-                      label: "Заметки",
+                      label: "Задачи",
                     ),
                   ],
                   selectedIndex: _selectedScreen,
@@ -316,7 +321,7 @@ class _MainState extends State<Main> {
                         ),
                         NavigationRailDestination(
                           icon: Icon(Icons.notes),
-                          label: Text("Заметки"),
+                          label: Text("Задачи"),
                         ),
                       ],
                       selectedIndex: _selectedScreen,
@@ -397,7 +402,7 @@ class _MainState extends State<Main> {
                                     ? "${manager.name!.split(" ")[1]} "
                                     : manager.userName ?? "Войдите в аккаунт",
                                 style: TextStyle(
-                                  color: ColorScheme.of(context).surfaceVariant,
+                                  color: ColorScheme.of(context).onSurface,
                                 ),
                               ),
                             ),

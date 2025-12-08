@@ -107,6 +107,14 @@ void showSetupDialog(BuildContext context) {
             // ),
           ],
         ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("Закрыть"),
+          ),
+        ],
       );
     },
   );

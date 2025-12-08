@@ -40,7 +40,7 @@ class SessionManager with ChangeNotifier {
     password = null;
     name = null;
     group = null;
-
+    loggedIn = false;
     processor.clear();
     save.clear();
     notifyListeners();
