@@ -6,6 +6,7 @@ import 'package:timetable/models/lesson.dart';
 import 'package:timetable/models/note.dart';
 import 'package:timetable/models/relative_time.dart';
 import 'package:timetable/processors/group_processor.dart';
+import 'package:timetable/settings/tasks_settings.dart';
 import 'package:timetable/utils/color_utils.dart';
 import 'package:timetable/utils/lesson_time.dart';
 import 'package:timetable/utils/string_time_formatter.dart';
@@ -54,6 +55,7 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
 
   @override
   Widget build(BuildContext context) {
+    TasksSettings settings = Provider.of<TasksSettings>(context);
     final processor = context.read<GroupProcessor>();
     final save = context.read<SaveSystem>();
     return Center(
@@ -162,7 +164,7 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
                           ),
                         ),
                       ),
-                    Selector<GroupProcessor, Note?>(
+                    settings.tasksEnabled ? Selector<GroupProcessor, Note?>(
                       selector: (context, provider) =>
                           provider.getNote(widget.lesson),
                       builder: (context, note, child) {
@@ -199,12 +201,12 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
                           return SizedBox();
                         }
                       },
-                    ),
+                    ) : SizedBox(),
                   ],
                 ),
               ),
             ),
-            Selector<GroupProcessor, Note?>(
+            settings.tasksEnabled ? Selector<GroupProcessor, Note?>(
               selector: (context, provider) => provider.getNote(widget.lesson),
               builder: (context, note, child) {
                 if (note != null) {
@@ -216,7 +218,7 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
                   return SizedBox();
                 }
               },
-            ),
+            ) : SizedBox(),
           ],
         ),
       ),

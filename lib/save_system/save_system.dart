@@ -27,7 +27,11 @@ class SaveSystem {
     await _secure.deleteAll();
   }
 
-  void saveGroup(int n) => _prefs.setInt(groupKey, n);
+  bool loadTasksEnabled() => _prefs.getBool('TASKS_ENABLED_KEY') ?? true;
+  void saveTasksEnabled(bool enabled) =>
+      _prefs.setBool('TASKS_ENABLED_KEY', enabled);
+
+  void saveSubGroup(int n) => _prefs.setInt(groupKey, n);
   int? loadSubGroup() => _prefs.getInt(groupKey);
 
   void saveGroupName(String? name) {
@@ -81,4 +85,5 @@ class SaveSystem {
     await _secure.write(key: loginKey, value: login);
     await _secure.write(key: passwordKey, value: password);
   }
+  get prefs => _prefs;
 }

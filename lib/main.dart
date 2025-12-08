@@ -27,6 +27,7 @@ import 'package:timetable/models/lesson.dart';
 import 'package:timetable/other/debug_window.dart';
 import 'package:timetable/processors/group_processor.dart';
 import 'package:timetable/save_system/save_system.dart';
+import 'package:timetable/settings/tasks_settings.dart';
 import 'package:timetable/widgets/lesson_widget.dart';
 import 'package:timetable/screens/notes_screen.dart';
 import 'package:timetable/screens/schedule_screen.dart';
@@ -43,6 +44,7 @@ void main() async {
   groupProcessor.getSaveSystem(saveSystem);
 
   SessionManager sessionManager = SessionManager();
+  TasksSettings tasksSettings = TasksSettings(saveSystem.prefs);
 
   //Provider.debugCheckInvalidValueType = null;
   // debugPaintSizeEnabled = true;
@@ -53,6 +55,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => sessionManager),
+        ChangeNotifierProvider(create: (_) => tasksSettings),
         ChangeNotifierProxyProvider<SessionManager, GroupProcessor>(
           create: (_) => groupProcessor,
           update: (context, session, group) => group!..updateSession(session),
@@ -216,6 +219,12 @@ class _MainState extends State<Main> {
 
   @override
   Widget build(BuildContext context) {
+    TasksSettings tasksSettings = Provider.of<TasksSettings>(context);
+    if (_selectedScreen > 0 && tasksSettings.tasksEnabled == false) {
+      setState(() {
+        _selectedScreen = 0;
+      });
+    }
     _smallScreen = MediaQuery.of(context).size.width < 650 ? true : false;
     GroupProcessor processor = Provider.of<GroupProcessor>(context);
     SessionManager session = Provider.of<SessionManager>(context);
@@ -224,9 +233,7 @@ class _MainState extends State<Main> {
         return Scaffold(
           appBar: AppBar(
             title: Text(
-              processor.groupName != null
-                  ? session.group!
-                  : "Расписание",
+              processor.groupName != null ? session.group! : "Расписание",
             ),
             actions: [
               // MaterialButton(
@@ -288,9 +295,8 @@ class _MainState extends State<Main> {
               ),
             ],
           ),
-          bottomNavigationBar: !_smallScreen
-              ? null
-              : NavigationBar(
+          bottomNavigationBar: _smallScreen && tasksSettings.tasksEnabled
+              ? NavigationBar(
                   destinations: const <Widget>[
                     NavigationDestination(
                       icon: Icon(Icons.schedule),
@@ -310,10 +316,11 @@ class _MainState extends State<Main> {
                   labelBehavior: Platform.isAndroid || Platform.isIOS
                       ? NavigationDestinationLabelBehavior.alwaysShow
                       : NavigationDestinationLabelBehavior.alwaysHide,
-                ),
+                )
+              : null,
           body: Row(
             children: [
-              _smallScreen
+              _smallScreen || !tasksSettings.tasksEnabled
                   ? Text("")
                   : NavigationRail(
                       labelType: NavigationRailLabelType.all,
@@ -362,6 +369,10 @@ class _MainState extends State<Main> {
       useRootNavigator: true,
       builder: (BuildContext context) {
         SessionManager manager = Provider.of<SessionManager>(context);
+        TasksSettings? tasksSettings = Provider.of<TasksSettings?>(
+          context,
+          listen: true,
+        );
         return Theme(
           data: Theme.of(context).copyWith(),
           child: SizedBox(
@@ -424,6 +435,23 @@ class _MainState extends State<Main> {
                 //   child: Text("data"),
                 // ),
                 // LinearProgressIndicatorM3E(value: value),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: ListTile(
+                    leading: Icon(Icons.task),
+                    title: Text("Включить отображение меню задач"),
+                    trailing: Switch(
+                      value: tasksSettings?.tasksEnabled ?? true,
+                      onChanged: (bool value) {
+                        tasksSettings?.tasksEnabled = value;
+                      },
+                    ),
+                    onTap: () {
+                      tasksSettings?.tasksEnabled =
+                          !(tasksSettings.tasksEnabled);
+                    },
+                  ),
+                ),
               ],
             ),
           ),
