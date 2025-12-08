@@ -378,114 +378,116 @@ class _MainState extends State<Main> {
           child: SizedBox(
             height: 400,
             width: double.infinity,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  child: Card.filled(
-                    color: ColorScheme.of(context).surfaceVariant,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 40,
-                        child: Stack(
-                          children: [
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: !manager.loggedIn && !manager.offline
-                                  ? OutlinedButton(
-                                      onPressed: () {
-                                        showLoginDialogSecure(context);
-                                      },
-                                      child: Text("Войти"),
-                                    )
-                                  : manager.isLoggining
-                                  ? CircularProgressIndicatorM3E()
-                                  : FilledButton(
-                                      onPressed: () {
-                                        showSetupDialog(context);
-                                      },
-                                      child: Text("Управлять"),
-                                    ),
-                            ),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                manager.name != null
-                                    ? "${manager.name!.split(" ")[1]} "
-                                    : manager.userName ?? "Войдите в аккаунт",
-                                style: TextStyle(
-                                  color: ColorScheme.of(context).onSurface,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: Card.filled(
+                      color: ColorScheme.of(context).surfaceVariant,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: 40,
+                          child: Stack(
+                            children: [
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: !manager.loggedIn && !manager.offline
+                                    ? OutlinedButton(
+                                        onPressed: () {
+                                          showLoginDialogSecure(context);
+                                        },
+                                        child: Text("Войти"),
+                                      )
+                                    : manager.isLoggining
+                                    ? CircularProgressIndicatorM3E()
+                                    : FilledButton(
+                                        onPressed: () {
+                                          showSetupDialog(context);
+                                        },
+                                        child: Text("Управлять"),
+                                      ),
+                              ),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  manager.name != null
+                                      ? "${manager.name!.split(" ")[1]} "
+                                      : manager.userName ?? "Войдите в аккаунт",
+                                  style: TextStyle(
+                                    color: ColorScheme.of(context).onSurface,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                // CircularProgressIndicatorM3E(value: 0.6),
-                // ElevatedButton(
-                //   onPressed: () {
-                //     debugPrint("plus");
-                //     plus();
-                //   },
-                //   child: Text("data"),
-                // ),
-                // LinearProgressIndicatorM3E(value: value),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: ListTile(
-                    leading: Icon(Icons.task),
-                    title: Text("Показывать меню задач"),
-                    trailing: Switch(
-                      value: tasksSettings?.tasksEnabled ?? true,
-                      onChanged: (bool value) {
-                        tasksSettings?.tasksEnabled = value;
+                  // CircularProgressIndicatorM3E(value: 0.6),
+                  // ElevatedButton(
+                  //   onPressed: () {
+                  //     debugPrint("plus");
+                  //     plus();
+                  //   },
+                  //   child: Text("data"),
+                  // ),
+                  // LinearProgressIndicatorM3E(value: value),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: ListTile(
+                      leading: Icon(Icons.task),
+                      title: Text("Показывать меню задач"),
+                      trailing: Switch(
+                        value: tasksSettings?.tasksEnabled ?? true,
+                        onChanged: (bool value) {
+                          tasksSettings?.tasksEnabled = value;
+                        },
+                      ),
+                      onTap: () {
+                        tasksSettings?.tasksEnabled =
+                            !(tasksSettings.tasksEnabled);
                       },
                     ),
-                    onTap: () {
-                      tasksSettings?.tasksEnabled =
-                          !(tasksSettings.tasksEnabled);
-                    },
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: ListTile(
-                    leading: Icon(Icons.check_box_outline_blank),
-                    title: Text("Показывать \"окна\""),
-                    trailing: Switch(
-                      value: tasksSettings?.skipEnabled ?? true,
-                      onChanged: (bool value) {
-                        tasksSettings?.skipEnabled = value;
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: ListTile(
+                      leading: Icon(Icons.check_box_outline_blank),
+                      title: Text("Показывать \"окна\""),
+                      trailing: Switch(
+                        value: tasksSettings?.skipEnabled ?? true,
+                        onChanged: (bool value) {
+                          tasksSettings?.skipEnabled = value;
+                        },
+                      ),
+                      onTap: () {
+                        tasksSettings?.skipEnabled = !(tasksSettings.skipEnabled);
                       },
                     ),
-                    onTap: () {
-                      tasksSettings?.skipEnabled = !(tasksSettings.skipEnabled);
-                    },
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: ListTile(
-                    leading: Icon(Icons.arrow_downward),
-                    title: Text("Показывать, к какой паре приходить"),
-                    trailing: Switch(
-                      value: tasksSettings?.firstSkipEnabled ?? true,
-                      onChanged: (bool value) {
-                        tasksSettings?.firstSkipEnabled = value;
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: ListTile(
+                      leading: Icon(Icons.arrow_downward),
+                      title: Text("Показывать, к какой паре приходить"),
+                      trailing: Switch(
+                        value: tasksSettings?.firstSkipEnabled ?? true,
+                        onChanged: (bool value) {
+                          tasksSettings?.firstSkipEnabled = value;
+                        },
+                      ),
+                      onTap: () {
+                        tasksSettings?.firstSkipEnabled =
+                            !(tasksSettings.firstSkipEnabled);
                       },
                     ),
-                    onTap: () {
-                      tasksSettings?.firstSkipEnabled =
-                          !(tasksSettings.firstSkipEnabled);
-                    },
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );

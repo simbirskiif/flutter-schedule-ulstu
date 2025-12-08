@@ -1,5 +1,6 @@
 // ignore_for_file: unused_import, prefer_typing_uninitialized_variables, unnecessary_import, deprecated_member_use
 
+import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 import 'package:button_m3e/button_m3e.dart';
@@ -200,177 +201,212 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             ),
             Padding(
               padding: EdgeInsetsGeometry.symmetric(horizontal: 20),
-              child: TableCalendar(
-                focusedDay: selectedDay,
-                selectedDayPredicate: (day) {
-                  return day.year == selectedDay.year &&
-                      day.month == selectedDay.month &&
-                      day.day == selectedDay.day;
-                },
-                calendarBuilders: CalendarBuilders(
-                  defaultBuilder: (context, day, focusedDay) {
-                    final weekDay = DateFormat("E", "ru").format(day);
-                    return Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        children: [
-                          SizedBox(height: 5),
-                          Text(
-                            weekDay,
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: ColorScheme.of(
-                                context,
-                              ).onSecondaryContainer,
-                            ),
-                          ),
-                          SizedBox(height: 0),
-                          Text(
-                            "${day.day}",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: ColorScheme.of(
-                                context,
-                              ).onSecondaryContainer,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  selectedBuilder: (context, day, focusedDay) {
-                    final weekDay = DateFormat("E", "ru").format(day);
-                    return SizedBox(
-                      width: 45,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 0,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary,
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          children: [
-                            SizedBox(height: 5),
-                            Text(
-                              weekDay,
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: ColorScheme.of(context).onSecondary,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: 650, minHeight: 60),
+                child: Row(
+                  children: [
+                    !Platform.isAndroid && !Platform.isIOS
+                        ? IconButton(
+                            onPressed: () {
+                              _pageController.previousPage(
+                                duration: Duration(milliseconds: 500),
+                                curve: Curves.easeInOut,
+                              );
+                            },
+                            icon: Icon(Icons.chevron_left),
+                          )
+                        : SizedBox.shrink(),
+                    Expanded(
+                      child: TableCalendar(
+                        focusedDay: selectedDay,
+                        selectedDayPredicate: (day) {
+                          return day.year == selectedDay.year &&
+                              day.month == selectedDay.month &&
+                              day.day == selectedDay.day;
+                        },
+                        calendarBuilders: CalendarBuilders(
+                          defaultBuilder: (context, day, focusedDay) {
+                            final weekDay = DateFormat("E", "ru").format(day);
+                            return Container(
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                            ),
-                            SizedBox(height: 0),
-                            Text(
-                              "${day.day}",
-                              style: TextStyle(
-                                color: ColorScheme.of(context).onPrimary,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                              child: Column(
+                                children: [
+                                  SizedBox(height: 5),
+                                  Text(
+                                    weekDay,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: ColorScheme.of(
+                                        context,
+                                      ).onSecondaryContainer,
+                                    ),
+                                  ),
+                                  SizedBox(height: 0),
+                                  Text(
+                                    "${day.day}",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: ColorScheme.of(
+                                        context,
+                                      ).onSecondaryContainer,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
+                            );
+                          },
+                          selectedBuilder: (context, day, focusedDay) {
+                            final weekDay = DateFormat("E", "ru").format(day);
+                            return SizedBox(
+                              width: 45,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 0,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  shape: BoxShape.rectangle,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Column(
+                                  children: [
+                                    SizedBox(height: 5),
+                                    Text(
+                                      weekDay,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: ColorScheme.of(
+                                          context,
+                                        ).onSecondary,
+                                      ),
+                                    ),
+                                    SizedBox(height: 0),
+                                    Text(
+                                      "${day.day}",
+                                      style: TextStyle(
+                                        color: ColorScheme.of(
+                                          context,
+                                        ).onPrimary,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                          todayBuilder: (context, day, focusedDay) {
+                            final weekDay = DateFormat("E", "ru").format(day);
+                            return Container(
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Column(
+                                children: [
+                                  SizedBox(height: 5),
+                                  Text(
+                                    weekDay,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: ColorScheme.of(
+                                        context,
+                                      ).onSecondaryContainer,
+                                    ),
+                                  ),
+                                  SizedBox(height: 0),
+                                  Text(
+                                    "${day.day}",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: ColorScheme.of(
+                                        context,
+                                      ).onSecondaryContainer,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
-                      ),
-                    );
-                  },
-                  todayBuilder: (context, day, focusedDay) {
-                    final weekDay = DateFormat("E", "ru").format(day);
-                    return Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        children: [
-                          SizedBox(height: 5),
-                          Text(
-                            weekDay,
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: ColorScheme.of(
-                                context,
-                              ).onSecondaryContainer,
-                            ),
+                        calendarStyle: CalendarStyle(
+                          defaultDecoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
                           ),
-                          SizedBox(height: 0),
-                          Text(
-                            "${day.day}",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: ColorScheme.of(
-                                context,
-                              ).onSecondaryContainer,
-                            ),
+                          disabledDecoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
                           ),
-                        ],
+                          withinRangeDecoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                          ),
+                          outsideDecoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                          ),
+                          weekendDecoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                          ),
+                          todayDecoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.secondary,
+                            // border: Border.all(width: 10, ),
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                          ),
+                          selectedDecoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary,
+                            // border: Border.all(width: 10, ),
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                          ),
+                        ),
+                        firstDay: days.first,
+                        lastDay: days.last,
+                        calendarFormat: CalendarFormat.week,
+                        startingDayOfWeek: StartingDayOfWeek.monday,
+                        headerVisible: false,
+                        daysOfWeekVisible: false,
+                        locale: Localizations.localeOf(context).languageCode,
+                        onDaySelected: (newSelectedDay, focusedDay) {
+                          processor.setSelectedDay(newSelectedDay);
+                          int pageIndex = days.indexWhere((day) {
+                            return day.year == newSelectedDay.year &&
+                                day.month == newSelectedDay.month &&
+                                day.day == newSelectedDay.day;
+                          });
+                          if (pageIndex != -1) {
+                            _pageController.animateToPage(
+                              pageIndex,
+                              duration: Duration(milliseconds: 500),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        },
                       ),
-                    );
-                  },
+                    ),
+                    !Platform.isAndroid && !Platform.isIOS
+                        ? IconButton(
+                            onPressed: () {
+                              _pageController.nextPage(
+                                duration: Duration(milliseconds: 500),
+                                curve: Curves.easeInOut,
+                              );
+                            },
+                            icon: Icon(Icons.chevron_right),
+                          )
+                        : SizedBox.shrink(),
+                  ],
                 ),
-                calendarStyle: CalendarStyle(
-                  defaultDecoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                  ),
-                  disabledDecoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                  ),
-                  withinRangeDecoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                  ),
-                  outsideDecoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                  ),
-                  weekendDecoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                  ),
-                  todayDecoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondary,
-                    // border: Border.all(width: 10, ),
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                  ),
-                  selectedDecoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary,
-                    // border: Border.all(width: 10, ),
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                  ),
-                ),
-                firstDay: days.first,
-                lastDay: days.last,
-                calendarFormat: CalendarFormat.week,
-                startingDayOfWeek: StartingDayOfWeek.monday,
-                headerVisible: false,
-                daysOfWeekVisible: false,
-                locale: Localizations.localeOf(context).languageCode,
-                onDaySelected: (newSelectedDay, focusedDay) {
-                  processor.setSelectedDay(newSelectedDay);
-                  int pageIndex = days.indexWhere((day) {
-                    return day.year == newSelectedDay.year &&
-                        day.month == newSelectedDay.month &&
-                        day.day == newSelectedDay.day;
-                  });
-                  if (pageIndex != -1) {
-                    _pageController.animateToPage(
-                      pageIndex,
-                      duration: Duration(milliseconds: 500),
-                      curve: Curves.easeInOut,
-                    );
-                  }
-                },
               ),
             ),
             // MaterialButton(
