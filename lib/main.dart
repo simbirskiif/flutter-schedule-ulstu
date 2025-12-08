@@ -120,6 +120,7 @@ class _SplashScreenState extends State<SplashScreen> {
       processor.updateFromRaw(savedLessons);
       final savedSub = save.loadSubGroup() ?? 1;
       processor.setSubgroup(savedSub);
+      processor.importNotes(save.loadNotes());
       // Восстановить сохранённую группу в сессии (если есть)
       final savedGroup = save.loadGroupName();
       if (savedGroup != null) {
@@ -165,6 +166,7 @@ class _SplashScreenState extends State<SplashScreen> {
         await session.fetchUserData();
         await processor.updateFromGroup();
         processor.setSubgroup(save.loadSubGroup() ?? 1);
+        processor.importNotes(save.loadNotes());
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => Main()),
@@ -174,6 +176,7 @@ class _SplashScreenState extends State<SplashScreen> {
       } else {
         processor.updateFromRaw(save.loadLessons() ?? "");
         processor.setSubgroup(save.loadSubGroup() ?? 1);
+        processor.importNotes(save.loadNotes());
         session.offline = true;
 
         Navigator.pushReplacement(

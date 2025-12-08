@@ -30,8 +30,10 @@ class GroupProcessor with ChangeNotifier {
     _lessons = [];
   }
 
-  void loadNotes(Map<String, Note> map) {
-    for (Lesson lesson in _lessons) {}
+  void importNotes(Map<String, Note> map) {
+    for (Lesson lesson in _lessons) {
+      lesson.note = map[lesson.toString()];
+    }
   }
 
   Note? getNote(Lesson lesson) => lesson.note;
@@ -155,6 +157,19 @@ class GroupProcessor with ChangeNotifier {
     return Tuple2(OnlineStatus.ok, result);
   }
 
+  void updateLessons(List<Lesson> newLessons) {
+    Map<String, Note?> map = {};
+    for (Lesson lesson in _lessons) {
+      map[lesson.toString()] = lesson.note;
+    }
+
+    for (Lesson lesson in newLessons) {
+      lesson.note = map[lesson.toString()];
+    }
+
+    _lessons = newLessons;
+  }
+
   List<Lesson> get lessons => List.unmodifiable(_lessons);
   String? get groupName => _groupName;
   int get subgroupsCount => _subgroupsCount;
@@ -214,7 +229,7 @@ class GroupProcessor with ChangeNotifier {
       final newEnd = newLessons.last.dateTime;
       final newGroupName = newLessons.first.group;
       final newSubgroupCount = newLessons.map((e) => e.subgroup).reduce(max);
-      _lessons = newLessons;
+      updateLessons(newLessons);
       _groupName = newGroupName;
       _scheduleStartDate = newStart;
       _scheduleEndDate = newEnd;
@@ -244,7 +259,7 @@ class GroupProcessor with ChangeNotifier {
       final newGroupName = newLessons.first.group;
       final newSubgroupCount = newLessons.map((e) => e.subgroup).reduce(max);
 
-      _lessons = newLessons;
+      updateLessons(newLessons);
       _groupName = newGroupName;
       _scheduleStartDate = newStart;
       _scheduleEndDate = newEnd;

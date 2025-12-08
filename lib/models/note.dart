@@ -9,3 +9,5 @@ class Note {
     return Note(title: json['title'], content: json['content']);
   }
 }
+
+class SavedNotes {}

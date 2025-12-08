@@ -11,6 +11,7 @@ import 'package:timetable/utils/lesson_time.dart';
 import 'package:timetable/utils/string_time_formatter.dart';
 import 'package:timetable/widgets/new_lesson_type_widget.dart';
 import 'package:timetable/widgets/remote_lesson_placeholder.dart';
+import 'package:timetable/save_system/save_system.dart';
 import 'note_widgets.dart';
 
 class NewLessonWidget extends StatefulWidget {
@@ -54,6 +55,7 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
   @override
   Widget build(BuildContext context) {
     final processor = context.read<GroupProcessor>();
+    final save = context.read<SaveSystem>();
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: 650),
@@ -171,7 +173,7 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
                                 widget.lesson,
                                 Note(title: widget.lesson.nameOfLesson),
                               );
-                              debugPrint("Note has been created");
+                              save.saveNotes(processor.lessons);
                             },
                             child: Column(
                               children: [
