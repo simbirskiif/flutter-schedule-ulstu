@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:timetable/api/session_manager.dart';
 import 'package:timetable/dialog/fitst_setup_dialog.dart';
 import 'package:timetable/processors/group_processor.dart';
-import 'package:timetable/models/note.dart';
 import 'package:timetable/save_system/save_system.dart';
 
 void showSetupDialog(BuildContext context) {

@@ -11,22 +11,32 @@ class NotesScreen extends StatelessWidget {
     return Selector<GroupProcessor, int>(
       selector: (_, provider) => provider.notesCount,
       builder: (context, _, children) {
-        final lessons = context.watch<GroupProcessor>().lessons;
-        return ListView.builder(
-          itemCount: lessons.length,
-          itemBuilder: (_, index) {
-            return Visibility(
-              visible: lessons[index].note != null,
-              // Если виджет не видно, то ListView.builder не вызовет конструктор. Поэтому ошибки не будет, даже если у lessons[index] нет note
-              child: Align(
-                child: NoteWidget(
-                  lesson: lessons[index],
-                  closedBuilder: LessonNoteView.construct,
+        GroupProcessor processor = context.read<GroupProcessor>();
+        final lessons = processor.lessons;
+        return processor.notesCount > 0
+            ? ListView.builder(
+                itemCount: lessons.length,
+                itemBuilder: (_, index) {
+                  return Visibility(
+                    visible: lessons[index].note != null,
+                    // Если виджет не видно, то ListView.builder не вызовет конструктор. Поэтому ошибки не будет, даже если у lessons[index] нет note
+                    child: Align(
+                      child: NoteWidget(
+                        lesson: lessons[index],
+                        closedBuilder: LessonNoteView.construct,
+                      ),
+                    ),
+                  );
+                },
+              )
+            : Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.filter_list_off, size: 64),
+                    Text("Задач нет"),
+                  ],
                 ),
-              ),
-            );
-          },
-        );
+              );
       },
     );
   }

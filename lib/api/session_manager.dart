@@ -5,7 +5,6 @@ import 'package:timetable/api/user_data_fetch.dart';
 import 'package:timetable/enum/online_status.dart';
 import 'package:timetable/models/login_state.dart';
 import 'package:timetable/processors/group_processor.dart';
-import 'package:timetable/models/note.dart';
 import 'package:timetable/save_system/save_system.dart';
 
 class SessionManager with ChangeNotifier {

@@ -1,7 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:timetable/models/note.dart';
-import 'dart:convert';
 
 class SaveSystem {
   late FlutterSecureStorage _secure;
