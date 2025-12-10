@@ -465,7 +465,8 @@ class _MainState extends State<Main> {
                         },
                       ),
                       onTap: () {
-                        tasksSettings?.skipEnabled = !(tasksSettings.skipEnabled);
+                        tasksSettings?.skipEnabled =
+                            !(tasksSettings.skipEnabled);
                       },
                     ),
                   ),

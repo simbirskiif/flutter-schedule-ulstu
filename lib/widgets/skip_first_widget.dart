@@ -9,32 +9,32 @@ class SkipFirstWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TasksSettings settings = Provider.of<TasksSettings>(context);
-    return skip > 0 && settings.firstSkipEnabled
-        ? Center(
-          child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 650, minHeight: 48),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Row(
-                    children: [
-                      Positioned(bottom: 0, child: Icon(Icons.arrow_downward)),
-                      Center(
-                        child: Text(
-                          "Приходить к ${skip + 1}-й паре",
-                          style: TextStyle(
-                            color: ColorScheme.of(context).onSurface,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                    ],
+
+    if (skip <= 0 || !settings.firstSkipEnabled) return SizedBox.shrink();
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: 650, minHeight: 48),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(Icons.arrow_downward), // слева стрелка
+              SizedBox(width: 8), // небольшой отступ
+              Expanded(
+                child: Text(
+                  "Приходить к ${skip + 1}-й паре",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 14,
                   ),
                 ),
               ),
-            ),
-        )
-        : SizedBox.shrink();
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

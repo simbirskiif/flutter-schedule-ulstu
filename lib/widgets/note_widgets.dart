@@ -54,7 +54,7 @@ class LessonNoteView extends StatelessWidget {
           child: Column(
             children: [
               Selector<GroupProcessor, String?>(
-                selector: (_, provider) => provider.getNote(lesson)!.title,
+                selector: (_, provider) => provider.getNote(lesson) != null ? provider.getNote(lesson)!.title : "",
                 builder: (context, title, child) {
                   return Text(
                     title ?? "",

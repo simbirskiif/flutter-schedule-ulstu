@@ -1,4 +1,3 @@
-import 'package:button_m3e/button_m3e.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timetable/api/session_manager.dart';
