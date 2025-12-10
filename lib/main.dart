@@ -27,6 +27,7 @@ import 'package:timetable/models/lesson.dart';
 import 'package:timetable/other/debug_window.dart';
 import 'package:timetable/processors/group_processor.dart';
 import 'package:timetable/save_system/save_system.dart';
+import 'package:timetable/screens/home_screen.dart';
 import 'package:timetable/settings/tasks_settings.dart';
 import 'package:timetable/widgets/lesson_widget.dart';
 import 'package:timetable/screens/notes_screen.dart';
@@ -215,25 +216,31 @@ class Main extends StatefulWidget {
 class _MainState extends State<Main> {
   int _selectedScreen = 0;
   bool _smallScreen = true;
-  final List<Widget> _screens = [ScheduleScreen(), NotesScreen()];
+  final List<Widget> _screens = [HomeScreen(), ScheduleScreen(), NotesScreen()];
 
   @override
   Widget build(BuildContext context) {
     TasksSettings tasksSettings = Provider.of<TasksSettings>(context);
-    if (_selectedScreen > 0 && tasksSettings.tasksEnabled == false) {
+    if (_selectedScreen == 2 && tasksSettings.tasksEnabled == false) {
       setState(() {
         _selectedScreen = 0;
       });
     }
     _smallScreen = MediaQuery.of(context).size.width < 650 ? true : false;
     GroupProcessor processor = Provider.of<GroupProcessor>(context);
+    final days = processor.days;
+    if (days.isEmpty) {
+      setState(() {
+        _selectedScreen = 0;
+      });
+    }
     SessionManager session = Provider.of<SessionManager>(context);
     return Builder(
       builder: (innerContext) {
         return Scaffold(
           appBar: AppBar(
             title: Text(
-              processor.groupName != null ? session.group! : "Расписание",
+              processor.groupName != null ? processor.groupName! : "Расписание",
             ),
             actions: [
               // MaterialButton(
@@ -295,18 +302,33 @@ class _MainState extends State<Main> {
               ),
             ],
           ),
-          bottomNavigationBar: _smallScreen && tasksSettings.tasksEnabled
+          bottomNavigationBar: _smallScreen && days.isNotEmpty
               ? NavigationBar(
-                  destinations: const <Widget>[
-                    NavigationDestination(
-                      icon: Icon(Icons.schedule),
-                      label: "Расписание",
-                    ),
-                    NavigationDestination(
-                      icon: Icon(Icons.notes),
-                      label: "Задачи",
-                    ),
-                  ],
+                  destinations: tasksSettings.tasksEnabled
+                      ? const <Widget>[
+                          NavigationDestination(
+                            icon: Icon(Icons.home),
+                            label: "Главная",
+                          ),
+                          NavigationDestination(
+                            icon: Icon(Icons.schedule),
+                            label: "Расписание",
+                          ),
+                          NavigationDestination(
+                            icon: Icon(Icons.notes),
+                            label: "Задачи",
+                          ),
+                        ]
+                      : const <Widget>[
+                          NavigationDestination(
+                            icon: Icon(Icons.home),
+                            label: "Главная",
+                          ),
+                          NavigationDestination(
+                            icon: Icon(Icons.schedule),
+                            label: "Расписание",
+                          ),
+                        ],
                   selectedIndex: _selectedScreen,
                   onDestinationSelected: (value) => {
                     setState(() {
@@ -320,27 +342,42 @@ class _MainState extends State<Main> {
               : null,
           body: Row(
             children: [
-              _smallScreen || !tasksSettings.tasksEnabled
-                  ? Text("")
-                  : NavigationRail(
+              !_smallScreen && days.isNotEmpty
+                  ? NavigationRail(
                       labelType: NavigationRailLabelType.all,
-                      destinations: const <NavigationRailDestination>[
-                        NavigationRailDestination(
-                          icon: Icon(Icons.schedule),
-                          label: Text("Расписание"),
-                        ),
-                        NavigationRailDestination(
-                          icon: Icon(Icons.notes),
-                          label: Text("Задачи"),
-                        ),
-                      ],
+                      destinations: tasksSettings.tasksEnabled
+                          ? const <NavigationRailDestination>[
+                              NavigationRailDestination(
+                                icon: Icon(Icons.home),
+                                label: Text("Главная"),
+                              ),
+                              NavigationRailDestination(
+                                icon: Icon(Icons.schedule),
+                                label: Text("Расписание"),
+                              ),
+                              NavigationRailDestination(
+                                icon: Icon(Icons.notes),
+                                label: Text("Задачи"),
+                              ),
+                            ]
+                          : const <NavigationRailDestination>[
+                              NavigationRailDestination(
+                                icon: Icon(Icons.home),
+                                label: Text("Главная"),
+                              ),
+                              NavigationRailDestination(
+                                icon: Icon(Icons.schedule),
+                                label: Text("Расписание"),
+                              ),
+                            ],
                       selectedIndex: _selectedScreen,
                       onDestinationSelected: (value) {
                         setState(() {
                           _selectedScreen = value;
                         });
                       },
-                    ),
+                    )
+                  : Text(""),
               Expanded(
                 child: IndexedStack(index: _selectedScreen, children: _screens),
               ),

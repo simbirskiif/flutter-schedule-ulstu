@@ -172,24 +172,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               child: Row(
                 children: [
-                  Builder(
-                    builder: (context) {
-                      int week = getWeekFromDate(selectedDay);
-                      // for (var lesson in processor.lessons) {
-                      //   if (lesson.dateTime.day == selectedDay.day &&
-                      //       lesson.dateTime.month == selectedDay.month &&
-                      //       lesson.dateTime.year == selectedDay.year) {
-                      //     week = lesson.week;
-                      //   }
-                      // }
-                      return Text(
-                        "$week-я неделя",
-                        style: TextStyle(
-                          color: ColorScheme.of(context).onSurface,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    },
+                  Text(
+                    "${getWeekFromDate(selectedDay)}-я неделя",
+                    style: TextStyle(
+                      color: ColorScheme.of(context).onSurface,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   Spacer(),
                   Text(
