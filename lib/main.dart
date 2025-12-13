@@ -55,7 +55,7 @@ void main() async {
   //   debugPrint('Frame timings: ${timings.length}');
   // };
   if (!Platform.isAndroid && !Platform.isIOS) {
-    WindowOptions options = WindowOptions(minimumSize: Size(600, 400));
+    WindowOptions options = WindowOptions(minimumSize: Size(450, 400));
     windowManager.waitUntilReadyToShow(options, () async {
       await windowManager.setTitle("Расписание УлГТУ");
       await windowManager.show();

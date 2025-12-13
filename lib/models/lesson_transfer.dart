@@ -12,7 +12,7 @@ class LessonTransfer {
 
 List<LessonTransfer> transferLessons(List<Lesson> lessons) {
   final transfers = <LessonTransfer>[];
-  if(lessons.length > 1){
+  if(lessons.isNotEmpty){
     transfers.add(LessonTransfer(lesson: null, skip: lessons[0].index));
   }
   for (int i = 0; i < lessons.length; i++) {
