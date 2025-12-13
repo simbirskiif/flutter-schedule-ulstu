@@ -97,18 +97,24 @@ class _HomeScreenState extends State<HomeScreen> {
                       left: 0,
                       right: 0,
                       bottom: 5,
-                      child: Center(
-                        child: ButtonM3E(
-                          onPressed: () {
-                            showLoginDialogSecure(context);
-                          },
-                          label: Center(
-                            child: Row(
-                              children: [
-                                Text("Войти в аккаунт"),
-                                Spacer(),
-                                Icon(Icons.arrow_forward),
-                              ],
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Center(
+                          child: ButtonM3E(
+                            onPressed: () {
+                              showLoginDialogSecure(context);
+                            },
+                            label: Center(
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "Войти в аккаунт",
+                                    style: TextStyle(fontSize: 14),
+                                  ),
+                                  Spacer(),
+                                  Icon(Icons.arrow_forward, size: 18,),
+                                ],
+                              ),
                             ),
                           ),
                         ),

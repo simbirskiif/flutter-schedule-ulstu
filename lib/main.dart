@@ -1,16 +1,17 @@
 // ignore_for_file: unused_import, prefer_typing_uninitialized_variables, unnecessary_import, deprecated_member_use, use_build_context_synchronously
 import 'dart:convert';
-import 'dart:ffi';
+import 'dart:ffi' hide Size;
 import 'dart:math';
-import 'dart:ui';
+import 'dart:ui' hide Size;
 import 'dart:io' show Platform;
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:expressive_loading_indicator/expressive_loading_indicator.dart';
 import 'package:expressive_refresh/expressive_refresh.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter/rendering.dart' hide Size;
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_indicator_m3e/loading_indicator_m3e.dart';
 import 'package:progress_indicator_m3e/progress_indicator_m3e.dart';
@@ -35,6 +36,7 @@ import 'package:timetable/screens/schedule_screen.dart';
 import 'package:timetable/utils/filter.dart';
 import 'package:timetable/utils/lessons.dart';
 import 'package:timetable/models/note.dart';
+import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,6 +54,14 @@ void main() async {
   // PlatformDispatcher.instance.onReportTimings = (timings) {
   //   debugPrint('Frame timings: ${timings.length}');
   // };
+  if (!Platform.isAndroid && !Platform.isIOS) {
+    WindowOptions options = WindowOptions(minimumSize: Size(600, 400));
+    windowManager.waitUntilReadyToShow(options, () async {
+      await windowManager.setTitle("Расписание УлГТУ");
+      await windowManager.show();
+      await windowManager.focus();
+    });
+  }
   runApp(
     MultiProvider(
       providers: [
@@ -234,7 +244,6 @@ class _MainState extends State<Main> {
         _selectedScreen = 0;
       });
     }
-    SessionManager session = Provider.of<SessionManager>(context);
     return Builder(
       builder: (innerContext) {
         return Scaffold(

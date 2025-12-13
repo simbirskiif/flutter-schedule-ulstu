@@ -82,8 +82,13 @@ List<Lesson> converDumpToLessons(List<DumpLesson> dumps) {
       name = name
           .replaceFirst(RegExp(r'^лаб\.?', caseSensitive: false), '')
           .trim();
+    } else if (lowerName.startsWith("зач")) {
+      lessonType = LessonTypes.undefined;
+      name = name
+          .replaceFirst(RegExp(r'^зач\.?', caseSensitive: false), '')
+          .trim();
     } else {
-      lessonType = LessonTypes.seminar;
+      lessonType = LessonTypes.undefined;
     }
 
     bool isRemote = room.toUpperCase().contains("ДОТ");
@@ -126,6 +131,7 @@ DateTime lessonDateTime(int week, int day, int index) {
     time.inMinutes % 60,
   );
 }
+
 int getWeekFromDate(DateTime date) {
   final now = DateTime.now();
   final int startYear = now.month >= 9 ? now.year : now.year - 1;
