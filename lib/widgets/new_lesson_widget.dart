@@ -164,61 +164,137 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
                           ),
                         ),
                       ),
-                    settings.tasksEnabled ? Selector<GroupProcessor, Note?>(
-                      selector: (context, provider) =>
-                          provider.getNote(widget.lesson),
-                      builder: (context, note, child) {
-                        if (note == null) {
-                          return GestureDetector(
-                            onTap: () {
-                              processor.setNote(
-                                widget.lesson,
-                                Note(title: widget.lesson.nameOfLesson),
-                              );
-                              save.saveNotes(processor.lessons);
-                            },
-                            child: Column(
-                              children: [
-                                const Divider(height: 8),
-                                Row(
-                                  children: [
-                                    Icon(Icons.add),
-                                    SizedBox(width: 4),
-                                    Text(
-                                      "Добавьте задачу для этого занятия",
-                                      style: TextStyle(
-                                        color: ColorScheme.of(
+                    settings.tasksEnabled
+                        ? Column(
+                            children: [
+                              Selector<GroupProcessor, Note?>(
+                                selector: (context, provider) =>
+                                    provider.getNote(widget.lesson),
+                                builder: (context, note, child) {
+                                  if (note == null) {
+                                    return GestureDetector(
+                                      onTap: () async {
+                                        processor.setNote(
+                                          widget.lesson,
+                                          Note(
+                                            title: widget.lesson.nameOfLesson,
+                                          ),
+                                        );
+                                        await Navigator.push(
                                           context,
-                                        ).onSurface,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                FullScreenView(
+                                                  lesson: widget.lesson,
+                                                  action: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                ),
+                                          ),
+                                        );
+                                      },
+                                      child: Column(
+                                        children: [
+                                          const Divider(height: 8),
+                                          Row(
+                                            children: [
+                                              Icon(Icons.add),
+                                              SizedBox(width: 4),
+                                              Text(
+                                                "Добавьте задачу для этого занятия",
+                                                style: TextStyle(
+                                                  color: ColorScheme.of(
+                                                    context,
+                                                  ).onSurface,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          );
-                        } else {
-                          return SizedBox();
-                        }
-                      },
-                    ) : SizedBox(),
+                                    );
+                                  } else {
+                                    return SizedBox();
+                                  }
+                                },
+                              ),
+                              Selector<GroupProcessor, bool>(
+                                selector: (context, provider) {
+                                  return provider.nextLessonHasNote(
+                                    widget.lesson,
+                                  );
+                                },
+                                builder: (context, nextLessonHasNote, child) {
+                                  if (!nextLessonHasNote) {
+                                    return GestureDetector(
+                                      onTap: () async {
+                                        Note initialNote = Note(
+                                          title: widget.lesson.nameOfLesson,
+                                        );
+                                        await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                FullScreenNoteEditor(
+                                                  initialNote: initialNote,
+                                                  onSave: (editedNote) =>
+                                                      processor.addNoteToNext(
+                                                        widget.lesson,
+                                                        editedNote,
+                                                      ),
+                                                ),
+                                          ),
+                                        );
+                                      },
+                                      child: Column(
+                                        children: [
+                                          const Divider(height: 8),
+                                          Row(
+                                            children: [
+                                              Icon(Icons.note_add),
+                                              SizedBox(width: 4),
+                                              Text(
+                                                "Добавьте задачу для следующего занятия",
+                                                style: TextStyle(
+                                                  color: ColorScheme.of(
+                                                    context,
+                                                  ).onSurfaceVariant,
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  } else {
+                                    return SizedBox();
+                                  }
+                                },
+                              ),
+                            ],
+                          )
+                        : SizedBox(),
                   ],
                 ),
               ),
             ),
-            settings.tasksEnabled ? Selector<GroupProcessor, Note?>(
-              selector: (context, provider) => provider.getNote(widget.lesson),
-              builder: (context, note, child) {
-                if (note != null) {
-                  return NoteWidget(
-                    closedBuilder: ScheduleNoteView.construct,
-                    lesson: widget.lesson,
-                  );
-                } else {
-                  return SizedBox();
-                }
-              },
-            ) : SizedBox(),
+            settings.tasksEnabled
+                ? Selector<GroupProcessor, Note?>(
+                    selector: (context, provider) =>
+                        provider.getNote(widget.lesson),
+                    builder: (context, note, child) {
+                      if (note != null) {
+                        return NoteWidget(
+                          closedBuilder: ScheduleNoteView.construct,
+                          lesson: widget.lesson,
+                        );
+                      } else {
+                        return SizedBox();
+                      }
+                    },
+                  )
+                : SizedBox(),
           ],
         ),
       ),
