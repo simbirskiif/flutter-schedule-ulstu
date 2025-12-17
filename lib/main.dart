@@ -40,12 +40,10 @@ import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  PendingNotes pendingNotes = PendingNotes();
   final saveSystem = SaveSystem();
   await saveSystem.init();
 
   final groupProcessor = GroupProcessor();
-  groupProcessor.getPendingNotes(pendingNotes);
   groupProcessor.getSaveSystem(saveSystem);
 
   SessionManager sessionManager = SessionManager();
@@ -69,8 +67,6 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => sessionManager),
         ChangeNotifierProvider(create: (_) => tasksSettings),
-        Provider(create: (_) => pendingNotes),
-        Provider(create: (_) => saveSystem),
         ChangeNotifierProxyProvider<SessionManager, GroupProcessor>(
           create: (_) => groupProcessor,
           update: (context, session, group) => group!..updateSession(session),
@@ -130,11 +126,6 @@ class _SplashScreenState extends State<SplashScreen> {
     final save = context.read<SaveSystem>();
     final session = context.read<SessionManager>();
     final processor = context.read<GroupProcessor>();
-    final pendingNotes = context.read<PendingNotes>();
-
-    // PendingNotes ни от чего не зависят
-    pendingNotes.addFromJson(save.getPendingNotes());
-    print(jsonEncode(pendingNotes.toJson()));
 
     // Попытаемся загрузить локальные уроки сразу
     final savedLessons = save.loadLessons();
@@ -143,7 +134,7 @@ class _SplashScreenState extends State<SplashScreen> {
       processor.updateFromRaw(savedLessons);
       final savedSub = save.loadSubGroup() ?? 1;
       processor.setSubgroup(savedSub);
-      processor.importSavedNotes(save.loadNotes());
+      processor.importNotes(save.loadNotes());
       // Восстановить сохранённую группу в сессии (если есть)
       final savedGroup = save.loadGroupName();
       if (savedGroup != null) {
@@ -189,7 +180,7 @@ class _SplashScreenState extends State<SplashScreen> {
         await session.fetchUserData();
         await processor.updateFromGroup();
         processor.setSubgroup(save.loadSubGroup() ?? 1);
-        processor.importSavedNotes(save.loadNotes());
+        processor.importNotes(save.loadNotes());
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => Main()),
@@ -199,7 +190,7 @@ class _SplashScreenState extends State<SplashScreen> {
       } else {
         processor.updateFromRaw(save.loadLessons() ?? "");
         processor.setSubgroup(save.loadSubGroup() ?? 1);
-        processor.importSavedNotes(save.loadNotes());
+        processor.importNotes(save.loadNotes());
         session.offline = true;
 
         Navigator.pushReplacement(

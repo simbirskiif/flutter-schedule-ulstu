@@ -11,9 +11,8 @@ class SaveSystem {
   final notesKey = 'NOTES_KEY';
   final loginKey = 'LOGIN_KEY';
   final passwordKey = 'PASSWORD_KEY';
-  final groupKey = 'GROUP_KEY';
-  final groupNameKey = 'GROUP_NAME_KEY';
-  final pendingKey = 'PENDING_NOTES_KEY';
+  final groupKey = 'GROUP_KEY'; // used for subgroup int
+  final groupNameKey = 'GROUP_NAME_KEY'; // store group name string
 
   SaveSystem();
 
@@ -43,14 +42,19 @@ class SaveSystem {
     }
   }
 
-  void savePendingNotes(PendingNotes pendingNotes) {
-    _prefs.setString(pendingKey, jsonEncode(pendingNotes));
-  }
-
-  String? getPendingNotes() => _prefs.getString(pendingKey);
-
   void saveNotes(List<Lesson> lessons) {
-    _prefs.setString(notesKey, notesToJson(lessons));
+    Map<String, dynamic> map = {};
+    for (var lesson in lessons) {
+      if (lesson.note != null) {
+        map[lesson.toString()] = {
+          'title': lesson.note!.title,
+          'content': lesson.note!.content,
+        };
+      }
+    }
+
+    String json = jsonEncode(map);
+    _prefs.setString(notesKey, json);
   }
 
   Map<String, Note> loadNotes() {
@@ -73,6 +77,7 @@ class SaveSystem {
   void saveLessons(String json) => _prefs.setString(lessonsKey, json);
   String? loadLessons() => _prefs.getString(lessonsKey);
 
+  // explicit async wrappers for secure storage
   Future<String?> getPassword() => _secure.read(key: passwordKey);
   Future<String?> getLogin() => _secure.read(key: loginKey);
 
@@ -80,6 +85,5 @@ class SaveSystem {
     await _secure.write(key: loginKey, value: login);
     await _secure.write(key: passwordKey, value: password);
   }
-
   get prefs => _prefs;
 }

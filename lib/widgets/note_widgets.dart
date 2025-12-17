@@ -33,7 +33,7 @@ class NoteWidget extends StatelessWidget {
           child: closedBuilder(lesson: lesson),
         ),
         openBuilder: (context, action) =>
-            FullScreenView(action: action, lesson: lesson),
+            _FullScreenView(action: action, lesson: lesson),
       ),
     );
   }
@@ -53,11 +53,11 @@ class LessonNoteView extends StatelessWidget {
           padding: EdgeInsets.only(left: 26, right: 26, top: 10, bottom: 10),
           child: Column(
             children: [
-              Selector<GroupProcessor, Note?>(
-                selector: (_, provider) => provider.getNote(lesson),
-                builder: (context, note, child) {
+              Selector<GroupProcessor, String?>(
+                selector: (_, provider) => provider.getNote(lesson) != null ? provider.getNote(lesson)!.title : "",
+                builder: (context, title, child) {
                   return Text(
-                    note?.title ?? "",
+                    title ?? "",
                     style: TextStyle(
                       color: textColorForContainer(
                         context,
@@ -124,16 +124,16 @@ class ScheduleNoteView extends StatelessWidget {
   }
 }
 
-class FullScreenView extends StatefulWidget {
+class _FullScreenView extends StatefulWidget {
   final Function action;
   final Lesson lesson;
-  const FullScreenView({super.key, required this.action, required this.lesson});
+  const _FullScreenView({required this.action, required this.lesson});
 
   @override
-  State<FullScreenView> createState() => _FullScreenViewState();
+  State<_FullScreenView> createState() => _FullScreenViewState();
 }
 
-class _FullScreenViewState extends State<FullScreenView> {
+class _FullScreenViewState extends State<_FullScreenView> {
   @override
   Widget build(BuildContext context) {
     GroupProcessor processor = context.read<GroupProcessor>();
@@ -191,7 +191,7 @@ class _FullScreenViewState extends State<FullScreenView> {
 
 class _TextContainers extends StatelessWidget {
   final Note newNote;
-  final Lesson? lesson;
+  final Lesson lesson;
 
   const _TextContainers(this.newNote, this.lesson);
 
@@ -215,9 +215,7 @@ class _TextContainers extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           Text(
-            lesson != null
-                ? '${DayOfWeekTable.get(lesson!.day + 1)} | ${lesson!.index + 1} пара'
-                : 'Неизвестная дата',
+            '${DayOfWeekTable.get(lesson.day + 1)} | ${lesson.index + 1} пара',
             style: TextStyle(
               fontSize: 20,
               color: textColorForContainer(
@@ -251,67 +249,6 @@ class _TextContainers extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class FullScreenNoteEditor extends StatefulWidget {
-  final Note initialNote;
-  final Function(Note) onSave;
-  const FullScreenNoteEditor({
-    super.key,
-    required this.initialNote,
-    required this.onSave,
-  });
-
-  @override
-  State<FullScreenNoteEditor> createState() => _FullScreenNoteEditorState();
-}
-
-class _FullScreenNoteEditorState extends State<FullScreenNoteEditor> {
-  late Note editedNote;
-
-  @override
-  void initState() {
-    super.initState();
-    editedNote = Note(
-      title: widget.initialNote.title,
-      content: widget.initialNote.content,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Center(
-        child: Hero(
-          tag: "next_note_tag",
-          child: Material(
-            color: ColorScheme.of(context).surfaceVariant,
-            child: SizedBox.expand(
-              child: Center(
-                child: Stack(
-                  children: [
-                    _TextContainers(editedNote, null),
-                    Container(
-                      alignment: Alignment.bottomRight,
-                      margin: EdgeInsets.all(30),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          widget.onSave(editedNote);
-                          Navigator.pop(context);
-                        },
-                        child: Text("Сохранить"),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }

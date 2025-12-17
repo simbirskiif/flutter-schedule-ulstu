@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:timetable/api/fetch_final_response.dart';
 import 'package:timetable/api/session_manager.dart';
 import 'package:timetable/enum/online_status.dart';
@@ -6,17 +10,13 @@ import 'package:timetable/models/lesson.dart';
 import 'package:timetable/save_system/save_system.dart';
 import 'package:timetable/utils/lessons.dart';
 import 'package:timetable/models/note.dart';
-
 import 'dart:math';
-import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart';
+
 import 'package:tuple/tuple.dart';
 
 class GroupProcessor with ChangeNotifier {
   late SessionManager _session;
   late SaveSystem _saveSystem;
-  late PendingNotes _pendingNotes;
   List<Lesson> _lessons = [];
   String? _groupName;
   int _subgroupsCount = 0;
@@ -30,54 +30,13 @@ class GroupProcessor with ChangeNotifier {
     _lessons = [];
   }
 
-  bool nextLessonHasNote(Lesson lesson) {
-    Lesson? nextLesson = getNextLesson(lesson);
-    if (nextLesson == null) {
-      return _pendingNotes.hasPendingNotes(lesson);
-    }
-    return nextLesson.note != null;
+void importNotes(Map<String, Note> map) {
+  for (Lesson lesson in _lessons) {
+    lesson.note = map[lesson.toString()];
   }
+}
 
-  Lesson? getNextLesson(Lesson lesson) {
-    int index = _lessons.indexWhere((e) => e == lesson) + 1;
-    for (int i = index; i < _lessons.length; ++i) {
-      if (_lessons[i].id == lesson.id) {
-        return _lessons[i];
-      }
-    }
-    return null;
-  }
-
-  void addNoteToNext(Lesson lesson, Note note) {
-    var nextLesson = getNextLesson(lesson);
-    if (nextLesson != null) {
-      setNote(nextLesson, note);
-      return;
-    }
-    _pendingNotes.enqueue(lesson, note);
-    _saveSystem.savePendingNotes(_pendingNotes);
-    notifyListeners();
-  }
-
-  void attachPendingNotes() {
-    final now = DateTime.now();
-    var currentLessons = _lessons.where(
-      (lesson) => lesson.dateTime.isAfter(now),
-    );
-    for (var lesson in currentLessons) {
-      lesson.note = _pendingNotes.dequeueNote(lesson.id);
-    }
-  }
-
-  void importSavedNotes(Map<String, Note> map) {
-    for (Lesson lesson in _lessons) {
-      lesson.note = map[lesson.toString()];
-    }
-  }
-
-  Note? getNote(Lesson lesson) {
-    return lesson.note; // Необходимо для обновления в провайдере
-  }
+  Note? getNote(Lesson lesson) => lesson.note;
 
   void setNoteTitle(Lesson lesson, String title) {
     if (lesson.note == null) return;
@@ -93,7 +52,6 @@ class GroupProcessor with ChangeNotifier {
 
   void setNote(Lesson lesson, Note note) {
     lesson.note = note;
-    _saveSystem.saveNotes(_lessons);
     notifyListeners();
   }
 
@@ -119,10 +77,6 @@ class GroupProcessor with ChangeNotifier {
     _selectedDay = null;
     _currentSubgroup = 0;
     notifyListeners();
-  }
-
-  void getPendingNotes(PendingNotes pn) {
-    _pendingNotes = pn;
   }
 
   void getSaveSystem(SaveSystem system) {
@@ -203,6 +157,19 @@ class GroupProcessor with ChangeNotifier {
     return Tuple2(OnlineStatus.ok, result);
   }
 
+  void updateLessons(List<Lesson> newLessons) {
+    Map<String, Note?> map = {};
+    for (Lesson lesson in _lessons) {
+      map[lesson.toString()] = lesson.note;
+    }
+
+    for (Lesson lesson in newLessons) {
+      lesson.note = map[lesson.toString()];
+    }
+
+    _lessons = newLessons;
+  }
+
   List<Lesson> get lessons => List.unmodifiable(_lessons);
   String? get groupName => _groupName;
   int get subgroupsCount => _subgroupsCount;
@@ -262,9 +229,7 @@ class GroupProcessor with ChangeNotifier {
       final newEnd = newLessons.last.dateTime;
       final newGroupName = newLessons.first.group;
       final newSubgroupCount = newLessons.map((e) => e.subgroup).reduce(max);
-      _pendingNotes.syncFromLessons(lessons);
-      _lessons = newLessons;
-      attachPendingNotes();
+      updateLessons(newLessons);
       _groupName = newGroupName;
       _scheduleStartDate = newStart;
       _scheduleEndDate = newEnd;
@@ -293,9 +258,8 @@ class GroupProcessor with ChangeNotifier {
       final newEnd = newLessons.last.dateTime;
       final newGroupName = newLessons.first.group;
       final newSubgroupCount = newLessons.map((e) => e.subgroup).reduce(max);
-      _pendingNotes.syncFromLessons(lessons);
-      _lessons = newLessons;
-      attachPendingNotes();
+
+      updateLessons(newLessons);
       _groupName = newGroupName;
       _scheduleStartDate = newStart;
       _scheduleEndDate = newEnd;
