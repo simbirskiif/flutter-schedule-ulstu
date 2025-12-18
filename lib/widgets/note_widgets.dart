@@ -39,9 +39,9 @@ class NoteWidget extends StatelessWidget {
   }
 }
 
-class LessonNoteView extends StatelessWidget {
+class ScreenNoteView extends StatelessWidget {
   final Lesson lesson;
-  const LessonNoteView.construct({super.key, required this.lesson});
+  const ScreenNoteView.construct({super.key, required this.lesson});
 
   @override
   Widget build(BuildContext context) {

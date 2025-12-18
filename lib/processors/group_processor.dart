@@ -293,9 +293,7 @@ class GroupProcessor with ChangeNotifier {
       final newEnd = newLessons.last.dateTime;
       final newGroupName = newLessons.first.group;
       final newSubgroupCount = newLessons.map((e) => e.subgroup).reduce(max);
-      _pendingNotes.syncFromLessons(lessons);
       _lessons = newLessons;
-      attachPendingNotes();
       _groupName = newGroupName;
       _scheduleStartDate = newStart;
       _scheduleEndDate = newEnd;
