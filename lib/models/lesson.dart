@@ -27,6 +27,8 @@ class Lesson {
     required this.isRemote,
     required this.lessonType,
   });
+
+  //
   @override
   String toString() {
     return "Date: $dateTime, type: $lessonType, subgroup: $subgroup, group: $group, name: $nameOfLesson, teacher: $teacher, room: $room, remote: $isRemote";
