@@ -9,23 +9,27 @@ class NotesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    GroupProcessor processor = context.read<GroupProcessor>();
-    if (processor.notesCount > 0) {
-      return Column(children: [NotesFromLesson()]);
-    } else {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.filter_list_off, size: 64),
-            Text(
-              "Задач нет",
-              style: TextStyle(color: ColorScheme.of(context).onSurface),
+    return Selector<GroupProcessor, int>(
+      selector: (_, processor) => processor.notesCount,
+      builder: (context, notesCount, child) {
+        if (notesCount > 0) {
+          return Column(children: [NotesFromLesson()]);
+        } else {
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.filter_list_off, size: 64),
+                Text(
+                  "Задач нет",
+                  style: TextStyle(color: ColorScheme.of(context).onSurface),
+                ),
+              ],
             ),
-          ],
-        ),
-      );
-    }
+          );
+        }
+      },
+    );
   }
 }
 
