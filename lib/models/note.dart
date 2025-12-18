@@ -101,7 +101,7 @@ class PendingNotes {
       data[lesson.id] = Queue();
     }
     final state = note == null ? PendingState.none : PendingState.hasNote;
-    data[lesson.id]!.add(PendingNote(state, note));
+    data[lesson.id]!.addFirst(PendingNote(state, note));
   }
 
   Map<String, dynamic> toJson() {
