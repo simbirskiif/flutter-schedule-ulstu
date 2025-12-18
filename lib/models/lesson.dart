@@ -31,4 +31,41 @@ class Lesson {
   String toString() {
     return "Date: $dateTime, type: $lessonType, subgroup: $subgroup, group: $group, name: $nameOfLesson, teacher: $teacher, room: $room, remote: $isRemote";
   }
+
+  String get id {
+    return '${subgroup}_${group}_${nameOfLesson}_$lessonType';
+  }
+
+  @override
+  int get hashCode {
+    return Object.hash(
+      week,
+      day,
+      index,
+      subgroup,
+      group,
+      dateTime,
+      teacher,
+      room,
+      nameOfLesson,
+      isRemote,
+      lessonType,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is Lesson &&
+        week == other.week &&
+        day == other.day &&
+        index == other.index &&
+        subgroup == other.subgroup &&
+        group == other.group &&
+        dateTime == other.dateTime &&
+        teacher == other.teacher &&
+        room == other.room &&
+        nameOfLesson == other.nameOfLesson &&
+        isRemote == other.isRemote &&
+        lessonType == other.lessonType;
+  }
 }
