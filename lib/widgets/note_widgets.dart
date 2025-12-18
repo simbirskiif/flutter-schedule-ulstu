@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:timetable/models/note.dart';
-import 'package:timetable/models/lesson.dart';
 import 'package:provider/provider.dart';
+import 'package:timetable/models/note.dart';
 import 'package:animations/animations.dart';
-import 'package:timetable/processors/group_processor.dart';
 import 'package:timetable/utils/color_utils.dart';
-import 'package:timetable/utils/day_of_week_table.dart';
+import 'package:timetable/models/lesson.dart';
+import 'package:timetable/processors/group_processor.dart';
 import 'package:timetable/save_system/save_system.dart';
 
-class NoteWidget extends StatelessWidget {
-  final Lesson lesson;
+class LessonNoteWidget extends StatelessWidget {
   final Function closedBuilder;
-  const NoteWidget({
+  final Lesson lesson;
+
+  const LessonNoteWidget({
     super.key,
     required this.lesson,
     required this.closedBuilder,
@@ -19,6 +19,54 @@ class NoteWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final processor = context.read<GroupProcessor>();
+    final saveSystem = context.read<SaveSystem>();
+    return Selector<GroupProcessor, Note>(
+      selector: (_, provider) =>
+          provider.getNote(lesson) ?? Note(title: "", content: ""),
+      builder: (_, note, _) {
+        return Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: OpenContainer(
+            transitionDuration: Duration(milliseconds: 500),
+            closedElevation: 0,
+            closedShape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            closedColor: ColorScheme.of(context).surfaceVariant,
+            closedBuilder: (context, action) {
+              return GestureDetector(onTap: action, child: closedBuilder());
+            },
+            openBuilder: (context, action) => FullScreenView(
+              action: action,
+              note: lesson.note,
+              onSave: (note) {
+                processor.setNote(lesson, note!);
+                saveSystem.saveNotes(processor.lessons);
+              },
+              onDelete: () {
+                processor.deleteNote(lesson);
+                saveSystem.saveNotes(processor.lessons);
+              },
+              label: lesson.label,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class PendingNoteWidget extends StatelessWidget {
+  final PendingNote pendingNote;
+
+  const PendingNoteWidget({super.key, required this.pendingNote});
+
+  @override
+  Widget build(BuildContext context) {
+    final processor = context.read<GroupProcessor>();
+    final saveSystem = context.read<SaveSystem>();
+    final pendingNotes = context.read<PendingNotes>();
     return Padding(
       padding: const EdgeInsets.only(top: 4),
       child: OpenContainer(
@@ -28,20 +76,41 @@ class NoteWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
         ),
         closedColor: ColorScheme.of(context).surfaceVariant,
-        closedBuilder: (context, action) => GestureDetector(
-          onTap: action,
-          child: closedBuilder(lesson: lesson),
+        closedBuilder: (context, action) {
+          return GestureDetector(
+            onTap: action,
+            child: ScreenNoteView.construct(
+              note: pendingNote.note ?? Note(title: "", content: ""),
+              label: 'Неизвестная дата',
+            ),
+          );
+        },
+        openBuilder: (context, action) => FullScreenView(
+          action: action,
+          note: pendingNote.note ?? Note(title: "", content: ""),
+          onSave: (note) {
+            processor.setPendingNote(pendingNote, note!);
+            saveSystem.savePendingNotes(pendingNotes);
+          },
+          onDelete: () {
+            processor.deletePending(pendingNote);
+            saveSystem.savePendingNotes(pendingNotes);
+          },
+          label: 'Неизвестная дата',
         ),
-        openBuilder: (context, action) =>
-            FullScreenView(action: action, lesson: lesson),
       ),
     );
   }
 }
 
 class ScreenNoteView extends StatelessWidget {
-  final Lesson lesson;
-  const ScreenNoteView.construct({super.key, required this.lesson});
+  final Note note;
+  final String label;
+  const ScreenNoteView.construct({
+    super.key,
+    required this.note,
+    required this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -53,23 +122,18 @@ class ScreenNoteView extends StatelessWidget {
           padding: EdgeInsets.only(left: 26, right: 26, top: 10, bottom: 10),
           child: Column(
             children: [
-              Selector<GroupProcessor, Note?>(
-                selector: (_, provider) => provider.getNote(lesson),
-                builder: (context, note, child) {
-                  return Text(
-                    note?.title ?? "",
-                    style: TextStyle(
-                      color: textColorForContainer(
-                        context,
-                        ColorScheme.of(context).surfaceVariant,
-                      ),
-                      fontSize: 16,
-                    ),
-                  );
-                },
+              Text(
+                note.title,
+                style: TextStyle(
+                  color: textColorForContainer(
+                    context,
+                    ColorScheme.of(context).surfaceVariant,
+                  ),
+                  fontSize: 16,
+                ),
               ),
               Text(
-                '${DayOfWeekTable.get(lesson.day + 1)} | ${lesson.index + 1} пара',
+                label,
                 style: TextStyle(
                   fontSize: 16,
                   color: textColorForContainer(
@@ -87,8 +151,8 @@ class ScreenNoteView extends StatelessWidget {
 }
 
 class ScheduleNoteView extends StatelessWidget {
-  final Lesson lesson;
-  const ScheduleNoteView.construct({super.key, required this.lesson});
+  final Note note;
+  const ScheduleNoteView.construct({super.key, required this.note});
 
   @override
   Widget build(BuildContext context) {
@@ -102,20 +166,17 @@ class ScheduleNoteView extends StatelessWidget {
           color: ColorScheme.of(context).surfaceVariant,
           child: Padding(
             padding: EdgeInsets.only(left: 6, bottom: 6, right: 2),
-            child: Selector<GroupProcessor, Note?>(
-              selector: (context, provider) => provider.getNote(lesson),
-              builder: (context, note, child) => Text(
-                note?.content ?? "",
-                style: TextStyle(
-                  color: textColorForContainer(
-                    context,
-                    ColorScheme.of(context).surfaceVariant,
-                  ),
-                  fontSize: 15,
+            child: Text(
+              note.content,
+              style: TextStyle(
+                color: textColorForContainer(
+                  context,
+                  ColorScheme.of(context).surfaceVariant,
                 ),
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.left,
+                fontSize: 15,
               ),
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.left,
             ),
           ),
         ),
@@ -125,9 +186,19 @@ class ScheduleNoteView extends StatelessWidget {
 }
 
 class FullScreenView extends StatefulWidget {
-  final Function action;
-  final Lesson lesson;
-  const FullScreenView({super.key, required this.action, required this.lesson});
+  final Note? note;
+  final VoidCallback action;
+  final ValueChanged<Note?> onSave;
+  final VoidCallback onDelete;
+  final String label;
+  const FullScreenView({
+    super.key,
+    required this.action,
+    required this.note,
+    required this.onSave,
+    required this.onDelete,
+    required this.label,
+  });
 
   @override
   State<FullScreenView> createState() => _FullScreenViewState();
@@ -136,11 +207,9 @@ class FullScreenView extends StatefulWidget {
 class _FullScreenViewState extends State<FullScreenView> {
   @override
   Widget build(BuildContext context) {
-    GroupProcessor processor = context.read<GroupProcessor>();
-    SaveSystem save = context.read<SaveSystem>();
     Note newNote = Note(
-      title: widget.lesson.note?.title ?? "",
-      content: widget.lesson.note?.content ?? "",
+      title: widget.note?.title ?? "",
+      content: widget.note?.content ?? "",
     );
     return Scaffold(
       appBar: AppBar(),
@@ -153,14 +222,15 @@ class _FullScreenViewState extends State<FullScreenView> {
               child: Center(
                 child: Stack(
                   children: [
-                    _TextContainers(newNote, widget.lesson),
+                    _TextContainers(newNote, widget.label),
                     Container(
                       alignment: Alignment.bottomRight,
                       margin: EdgeInsets.all(30),
                       child: ElevatedButton(
                         onPressed: () {
-                          processor.setNote(widget.lesson, newNote);
-                          save.saveNotes(processor.lessons);
+                          widget.onSave(newNote);
+                          //processor.setNote(widget.lesson, newNote);
+                          //save.saveNotes(processor.lessons);
                           widget.action();
                         },
                         child: Text("Сохранить"),
@@ -171,8 +241,9 @@ class _FullScreenViewState extends State<FullScreenView> {
                       margin: EdgeInsets.all(30),
                       child: ElevatedButton(
                         onPressed: () {
-                          processor.deleteNote(widget.lesson);
-                          save.saveNotes(processor.lessons);
+                          widget.onDelete();
+                          //processor.deleteNote(widget.lesson);
+                          //save.saveNotes(processor.lessons);
                           widget.action();
                         },
                         child: Text("Удалить"),
@@ -191,9 +262,9 @@ class _FullScreenViewState extends State<FullScreenView> {
 
 class _TextContainers extends StatelessWidget {
   final Note newNote;
-  final Lesson? lesson;
+  final String label;
 
-  const _TextContainers(this.newNote, this.lesson);
+  const _TextContainers(this.newNote, this.label);
 
   @override
   Widget build(BuildContext context) {
@@ -215,9 +286,7 @@ class _TextContainers extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           Text(
-            lesson != null
-                ? '${DayOfWeekTable.get(lesson!.day + 1)} | ${lesson!.index + 1} пара'
-                : 'Неизвестная дата',
+            label,
             style: TextStyle(
               fontSize: 20,
               color: textColorForContainer(
@@ -258,11 +327,13 @@ class _TextContainers extends StatelessWidget {
 
 class FullScreenNoteEditor extends StatefulWidget {
   final Note initialNote;
+  final String label;
   final Function(Note) onSave;
   const FullScreenNoteEditor({
     super.key,
     required this.initialNote,
     required this.onSave,
+    required this.label,
   });
 
   @override
@@ -294,7 +365,7 @@ class _FullScreenNoteEditorState extends State<FullScreenNoteEditor> {
               child: Center(
                 child: Stack(
                   children: [
-                    _TextContainers(editedNote, null),
+                    _TextContainers(editedNote, widget.label),
                     Container(
                       alignment: Alignment.bottomRight,
                       margin: EdgeInsets.all(30),

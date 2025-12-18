@@ -3,6 +3,7 @@ import 'package:timetable/models/note.dart';
 import 'package:timetable/widgets/note_widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:timetable/processors/group_processor.dart';
+import 'package:timetable/save_system/save_system.dart';
 
 class NotesScreen extends StatelessWidget {
   const NotesScreen({super.key});
@@ -13,7 +14,7 @@ class NotesScreen extends StatelessWidget {
       selector: (_, processor) => processor.notesCount,
       builder: (context, notesCount, child) {
         if (notesCount > 0) {
-          return Column(children: [NotesFromLesson()]);
+          return NotesFromLesson();
         } else {
           return Center(
             child: Column(
@@ -64,20 +65,34 @@ class NotesFromLesson extends StatelessWidget {
       child: Selector<GroupProcessor, int>(
         selector: (_, provider) => provider.notesCount,
         builder: (context, _, children) {
-          final lessons = context.read<GroupProcessor>().lessons;
+          final filteredLessons = context
+              .read<GroupProcessor>()
+              .lessons
+              .where((lesson) => lesson.note != null)
+              .toList();
+          final pendingNotesList = context.read<PendingNotes>().getList();
           return ListView.builder(
-            itemCount: lessons.length,
+            itemCount: filteredLessons.length + pendingNotesList.length,
             itemBuilder: (_, index) {
-              return Visibility(
-                visible: lessons[index].note != null,
-                // Если виджет не видно, то ListView.builder не вызовет конструктор. Поэтому ошибки не будет, даже если у lessons[index] нет note
-                child: Align(
-                  child: NoteWidget(
-                    lesson: lessons[index],
-                    closedBuilder: ScreenNoteView.construct,
+              if (index < filteredLessons.length) {
+                final lesson = filteredLessons[index];
+                return Align(
+                  child: LessonNoteWidget(
+                    lesson: lesson,
+                    closedBuilder: () => ScreenNoteView.construct(
+                      note: lesson.note ?? Note(title: "", content: ""),
+                      label: lesson.label,
+                    ),
                   ),
-                ),
-              );
+                );
+              } else {
+                return Align(
+                  child: PendingNoteWidget(
+                    pendingNote:
+                        pendingNotesList[index - filteredLessons.length],
+                  ),
+                );
+              }
             },
           );
         },

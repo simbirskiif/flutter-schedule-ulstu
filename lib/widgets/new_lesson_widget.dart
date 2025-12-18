@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:progress_indicator_m3e/progress_indicator_m3e.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +9,7 @@ import 'package:timetable/models/relative_time.dart';
 import 'package:timetable/processors/group_processor.dart';
 import 'package:timetable/settings/tasks_settings.dart';
 import 'package:timetable/utils/color_utils.dart';
+import 'package:timetable/utils/day_of_week_table.dart';
 import 'package:timetable/utils/lesson_time.dart';
 import 'package:timetable/utils/string_time_formatter.dart';
 import 'package:timetable/widgets/new_lesson_type_widget.dart';
@@ -173,19 +175,37 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
                                 builder: (context, note, child) {
                                   if (note == null) {
                                     return GestureDetector(
-                                      onTap: () async {
+                                      onTap: () {
                                         processor.setNote(
                                           widget.lesson,
                                           Note(
                                             title: widget.lesson.nameOfLesson,
                                           ),
                                         );
-                                        await Navigator.push(
+                                        Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 FullScreenView(
-                                                  lesson: widget.lesson,
+                                                  note: widget.lesson.note,
+                                                  onSave: (editedNote) {
+                                                    processor.setNote(
+                                                      widget.lesson,
+                                                      editedNote!,
+                                                    );
+                                                    save.saveNotes(
+                                                      processor.lessons,
+                                                    );
+                                                  },
+                                                  onDelete: () {
+                                                    processor.deleteNote(
+                                                      widget.lesson,
+                                                    );
+                                                    save.saveNotes(
+                                                      processor.lessons,
+                                                    );
+                                                  },
+                                                  label: widget.lesson.label,
                                                   action: () {
                                                     Navigator.pop(context);
                                                   },
@@ -234,15 +254,21 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
                                         await Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) =>
-                                                FullScreenNoteEditor(
-                                                  initialNote: initialNote,
-                                                  onSave: (editedNote) =>
-                                                      processor.addNoteToNext(
-                                                        widget.lesson,
-                                                        editedNote,
-                                                      ),
-                                                ),
+                                            builder: (context) {
+                                              Lesson? nextLesson = processor
+                                                  .getNextLesson(widget.lesson);
+                                              return FullScreenNoteEditor(
+                                                initialNote: initialNote,
+                                                onSave: (editedNote) =>
+                                                    processor.addNoteToNext(
+                                                      widget.lesson,
+                                                      editedNote,
+                                                    ),
+                                                label: nextLesson != null
+                                                    ? nextLesson.label
+                                                    : "Неизвестная дата",
+                                              );
+                                            },
                                           ),
                                         );
                                       },
@@ -285,9 +311,10 @@ class _NewLessonWidgetState extends State<NewLessonWidget> {
                         provider.getNote(widget.lesson),
                     builder: (context, note, child) {
                       if (note != null) {
-                        return NoteWidget(
-                          closedBuilder: ScheduleNoteView.construct,
+                        return LessonNoteWidget(
                           lesson: widget.lesson,
+                          closedBuilder: () =>
+                              ScheduleNoteView.construct(note: note),
                         );
                       } else {
                         return SizedBox();

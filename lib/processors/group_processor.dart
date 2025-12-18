@@ -97,8 +97,20 @@ class GroupProcessor with ChangeNotifier {
     notifyListeners();
   }
 
+  void setPendingNote(PendingNote pendingNote, Note note) {
+    pendingNote.note = note;
+    notifyListeners();
+  }
+
   void deleteNote(Lesson lesson) {
     lesson.note = null;
+    notifyListeners();
+  }
+
+  void deletePending(PendingNote pendingNote) {
+    pendingNote.note = null;
+    pendingNote.state = PendingState.none;
+    _pendingNotes.getList();
     notifyListeners();
   }
 
@@ -107,6 +119,7 @@ class GroupProcessor with ChangeNotifier {
     for (var lesson in _lessons) {
       if (lesson.note != null) ++n;
     }
+    n += _pendingNotes.getList().length;
     return n;
   }
 

@@ -1,5 +1,6 @@
 import 'package:timetable/widgets/lesson_type_widget.dart';
 import 'package:timetable/models/note.dart';
+import 'package:timetable/utils/day_of_week_table.dart';
 
 class Lesson {
   final int week;
@@ -28,10 +29,13 @@ class Lesson {
     required this.lessonType,
   });
 
-  //
   @override
   String toString() {
     return "Date: $dateTime, type: $lessonType, subgroup: $subgroup, group: $group, name: $nameOfLesson, teacher: $teacher, room: $room, remote: $isRemote";
+  }
+
+  String get label {
+    return '${DayOfWeekTable.get(day + 1)} | ${index + 1} пара';
   }
 
   String get id {

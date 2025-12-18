@@ -30,7 +30,7 @@ String notesToJson(List<Lesson> lessons) {
 enum PendingState { none, hasNote }
 
 class PendingNote {
-  final PendingState state;
+  PendingState state;
   Note? note;
   PendingNote(this.state, this.note);
 
@@ -61,8 +61,9 @@ class PendingNotes {
     data[lesson.id] ??= Queue();
     if (data[lesson.id]!.isNotEmpty) {
       PendingNote queueNote = data[lesson.id]!.first;
-      if (queueNote.note == null) {
+      if (queueNote.state == PendingState.none) {
         queueNote.note = note;
+        queueNote.state = PendingState.hasNote;
         return;
       }
     }
@@ -84,7 +85,9 @@ class PendingNotes {
   }
 
   bool hasPendingNotes(Lesson lesson) {
-    return data[lesson.id] != null && data[lesson.id]!.isNotEmpty;
+    return data[lesson.id] != null &&
+        data[lesson.id]!.isNotEmpty &&
+        data[lesson.id]!.first.state == PendingState.hasNote;
   }
 
   void syncFromLessons(List<Lesson> lessons) {
@@ -125,5 +128,17 @@ class PendingNotes {
       }
       data[key] = queue;
     });
+  }
+
+  List<PendingNote> getList() {
+    List<PendingNote> notes = [];
+    for (var queue in data.values) {
+      for (var pendingNote in queue) {
+        if (pendingNote.state == PendingState.hasNote) {
+          notes.add(pendingNote);
+        }
+      }
+    }
+    return notes;
   }
 }
