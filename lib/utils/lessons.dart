@@ -83,7 +83,7 @@ List<Lesson> converDumpToLessons(List<DumpLesson> dumps) {
           .replaceFirst(RegExp(r'^лаб\.?', caseSensitive: false), '')
           .trim();
     } else if (lowerName.startsWith("зач")) {
-      lessonType = LessonTypes.undefined;
+      lessonType = LessonTypes.credit;
       name = name
           .replaceFirst(RegExp(r'^зач\.?', caseSensitive: false), '')
           .trim();

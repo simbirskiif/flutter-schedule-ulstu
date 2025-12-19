@@ -322,6 +322,7 @@ class _MainState extends State<Main> {
               ),
             ],
           ),
+          //!Отвратительно блять
           bottomNavigationBar: (_smallScreen && tasksSettings.tasksEnabled) && processor.days.isNotEmpty
               ? NavigationBar(
                   destinations: const <Widget>[

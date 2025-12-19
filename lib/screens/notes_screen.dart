@@ -59,12 +59,13 @@ class NotesScreen extends StatelessWidget {
 
 class NotesFromLesson extends StatelessWidget {
   const NotesFromLesson({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Selector<GroupProcessor, int>(
         selector: (_, provider) => provider.notesCount,
-        builder: (context, _, children) {
+        builder: (context, _, __) {
           final filteredLessons = context
               .read<GroupProcessor>()
               .lessons
@@ -73,30 +74,80 @@ class NotesFromLesson extends StatelessWidget {
           final pendingNotesList = context.read<PendingNotes>().getList();
           return ListView.builder(
             itemCount: filteredLessons.length + pendingNotesList.length,
-            itemBuilder: (_, index) {
+            itemBuilder: (context, index) {
+              // ---------- LESSON NOTES ----------
               if (index < filteredLessons.length) {
                 final lesson = filteredLessons[index];
-                return Align(
-                  child: LessonNoteWidget(
-                    lesson: lesson,
-                    closedBuilder: () => ScreenNoteView.construct(
-                      note: lesson.note ?? Note(title: "", content: ""),
-                      label: lesson.label,
+                final DateTime currentDate = lesson.dateTime;
+                DateTime? previousDate;
+                if (index > 0) {
+                  previousDate = filteredLessons[index - 1].dateTime;
+                }
+                final bool showDateHeader =
+                    previousDate == null ||
+                    !_isSameDay(currentDate, previousDate);
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (showDateHeader) _DateHeader(date: currentDate),
+                    Align(
+                      child: LessonNoteWidget(
+                        lesson: lesson,
+                        closedBuilder: () => ScreenNoteView.construct(
+                          note: lesson.note ?? Note(title: "", content: ""),
+                          label: lesson.label,
+                        ),
+                      ),
                     ),
-                  ),
-                );
-              } else {
-                return Align(
-                  child: PendingNoteWidget(
-                    pendingNote:
-                        pendingNotesList[index - filteredLessons.length],
-                  ),
+                  ],
                 );
               }
+              // ---------- PENDING NOTES ----------
+              return Align(
+                child: PendingNoteWidget(
+                  pendingNote: pendingNotesList[index - filteredLessons.length],
+                ),
+              );
             },
           );
         },
       ),
     );
+  }
+
+  static bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+}
+
+class _DateHeader extends StatelessWidget {
+  final DateTime date;
+
+  const _DateHeader({required this.date});
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: AlignmentGeometry.center,
+      child: SizedBox(
+        width: 650,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Text(
+            _formatDate(date),
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: Colors.grey,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return "${date.day.toString().padLeft(2, '0')}."
+        "${date.month.toString().padLeft(2, '0')}."
+        "${date.year}";
   }
 }
