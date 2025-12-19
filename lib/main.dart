@@ -134,7 +134,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     // PendingNotes ни от чего не зависят
     pendingNotes.addFromJson(save.getPendingNotes());
-    print(jsonEncode(pendingNotes.toJson()));
+    // print(jsonEncode(pendingNotes.toJson()));
 
     // Попытаемся загрузить локальные уроки сразу
     final savedLessons = save.loadLessons();
@@ -235,18 +235,20 @@ class Main extends StatefulWidget {
 class _MainState extends State<Main> {
   int _selectedScreen = 0;
   bool _smallScreen = true;
-  final List<Widget> _screens = [HomeScreen(), ScheduleScreen(), NotesScreen()];
 
   @override
   Widget build(BuildContext context) {
     TasksSettings tasksSettings = Provider.of<TasksSettings>(context);
-    if (_selectedScreen == 2 && tasksSettings.tasksEnabled == false) {
+    GroupProcessor processor = Provider.of<GroupProcessor>(context);
+    List<Widget> screens = processor.days.isEmpty
+        ? [HomeScreen(), ScheduleScreen(), NotesScreen()]
+        : [ScheduleScreen(), NotesScreen()];
+    if (_selectedScreen == 1 && tasksSettings.tasksEnabled == false) {
       setState(() {
         _selectedScreen = 0;
       });
     }
     _smallScreen = MediaQuery.of(context).size.width < 650 ? true : false;
-    GroupProcessor processor = Provider.of<GroupProcessor>(context);
     final days = processor.days;
     if (days.isEmpty) {
       setState(() {
@@ -320,33 +322,18 @@ class _MainState extends State<Main> {
               ),
             ],
           ),
-          bottomNavigationBar: _smallScreen && days.isNotEmpty
+          bottomNavigationBar: (_smallScreen && tasksSettings.tasksEnabled) && processor.days.isNotEmpty
               ? NavigationBar(
-                  destinations: tasksSettings.tasksEnabled
-                      ? const <Widget>[
-                          NavigationDestination(
-                            icon: Icon(Icons.home),
-                            label: "Главная",
-                          ),
-                          NavigationDestination(
-                            icon: Icon(Icons.schedule),
-                            label: "Расписание",
-                          ),
-                          NavigationDestination(
-                            icon: Icon(Icons.notes),
-                            label: "Задачи",
-                          ),
-                        ]
-                      : const <Widget>[
-                          NavigationDestination(
-                            icon: Icon(Icons.home),
-                            label: "Главная",
-                          ),
-                          NavigationDestination(
-                            icon: Icon(Icons.schedule),
-                            label: "Расписание",
-                          ),
-                        ],
+                  destinations: const <Widget>[
+                    NavigationDestination(
+                      icon: Icon(Icons.schedule),
+                      label: "Расписание",
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.notes),
+                      label: "Задачи",
+                    ),
+                  ],
                   selectedIndex: _selectedScreen,
                   onDestinationSelected: (value) => {
                     setState(() {
@@ -360,44 +347,29 @@ class _MainState extends State<Main> {
               : null,
           body: Row(
             children: [
-              !_smallScreen && days.isNotEmpty
-                  ? NavigationRail(
+              (_smallScreen || !tasksSettings.tasksEnabled) || processor.days.isEmpty
+                  ? Text("")
+                  : NavigationRail(
                       labelType: NavigationRailLabelType.all,
-                      destinations: tasksSettings.tasksEnabled
-                          ? const <NavigationRailDestination>[
-                              NavigationRailDestination(
-                                icon: Icon(Icons.home),
-                                label: Text("Главная"),
-                              ),
-                              NavigationRailDestination(
-                                icon: Icon(Icons.schedule),
-                                label: Text("Расписание"),
-                              ),
-                              NavigationRailDestination(
-                                icon: Icon(Icons.notes),
-                                label: Text("Задачи"),
-                              ),
-                            ]
-                          : const <NavigationRailDestination>[
-                              NavigationRailDestination(
-                                icon: Icon(Icons.home),
-                                label: Text("Главная"),
-                              ),
-                              NavigationRailDestination(
-                                icon: Icon(Icons.schedule),
-                                label: Text("Расписание"),
-                              ),
-                            ],
+                      destinations: const <NavigationRailDestination>[
+                        NavigationRailDestination(
+                          icon: Icon(Icons.schedule),
+                          label: Text("Расписание"),
+                        ),
+                        NavigationRailDestination(
+                          icon: Icon(Icons.notes),
+                          label: Text("Задачи"),
+                        ),
+                      ],
                       selectedIndex: _selectedScreen,
                       onDestinationSelected: (value) {
                         setState(() {
                           _selectedScreen = value;
                         });
                       },
-                    )
-                  : Text(""),
+                    ),
               Expanded(
-                child: IndexedStack(index: _selectedScreen, children: _screens),
+                child: IndexedStack(index: _selectedScreen, children: screens),
               ),
             ],
           ),

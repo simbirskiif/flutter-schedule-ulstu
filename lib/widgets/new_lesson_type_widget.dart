@@ -39,6 +39,8 @@ class _NewLessonTypeWidgetState extends State<NewLessonTypeWidget> {
                   ? "Практика"
                   : widget.lessonType == LessonTypes.seminar
                   ? "Лабораторная"
+                  : widget.lessonType == LessonTypes.credit
+                  ? "Зачет"
                   : "?",
               style: TextStyle(
                 fontSize: 12,

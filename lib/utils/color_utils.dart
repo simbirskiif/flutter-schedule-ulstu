@@ -14,6 +14,8 @@ Color lessonTypeColor(BuildContext context, LessonTypes type) {
       return hsl.withHue((hsl.hue + 60) % 360).toColor();
     case LessonTypes.seminar:
       return hsl.withHue((hsl.hue + 120) % 360).toColor();
+    case LessonTypes.credit:
+      return hsl.withHue((hsl.hue + 120) % 360).toColor();
     case LessonTypes.undefined:
       // return hsl.withHue((hsl.hue + 180) % 360).toColor();
       return ColorScheme.of(context).error;
